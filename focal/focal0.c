@@ -25,8 +25,8 @@ synopsis
 description
 
 	Focal is a block-structured interpretive language.
-	It is described in the PDP-8 "Introduction to
-	Programming."  There is also a PDP-11 Focal manual.
+	It is described in the PDP-8 "Introduction to Programming."
+    There is also a PDP-11 Focal manual.
 
 	This version of focal runs on Vax/VMS and Unix.
 
