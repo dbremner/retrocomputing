@@ -14,7 +14,6 @@
 #include <signal.h>
 #include <math.h>
 
-#define	FUNCTIONS			/* enable functions */
 #define	NID	16			/* # characters in id */
 
 struct	line

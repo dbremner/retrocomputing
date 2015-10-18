@@ -70,7 +70,6 @@ int main()
 {
 	int	c;
 
-#ifdef FUNCTIONS
 	builtin("fsin", fsin);
 	builtin("fcos", fcos);
 	builtin("fexp", fexp);
@@ -81,7 +80,6 @@ int main()
 	builtin("fsgn", fsgn);
 	builtin("fitr", fitr);
 	builtin("fran", fran);
-#endif
 	setjmp(env);
 	catchcc();
 	for (;;) {

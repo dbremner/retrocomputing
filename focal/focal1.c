@@ -115,7 +115,6 @@ term(void)
 		c = *ctp++;
 	} while (isalnum(c));
 	*cp = 0;
-#ifdef FUNCTIONS
 	if (id[0]=='f' && (sp=lookup(id, S_FUNC, 0))!=NULL) {
 		while (c==' ' || c=='\t')
 			c = *ctp++;
@@ -126,7 +125,6 @@ term(void)
 			diag("Missing `)' for function");
 		return ((*sp->s_un.s_fp)(val));
 	}
-#endif
 	type = S_SCAL;
 	while (c==' ' || c=='\t')
 		c = *ctp++;
@@ -204,7 +202,6 @@ getsym(void)
 	return (sp);
 }
 
-#ifdef FUNCTIONS
 double
 fsin(double arg)
 {
@@ -275,4 +272,3 @@ fran(double arg)
 	return (drand48());
 }
 
-#endif

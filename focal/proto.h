@@ -20,7 +20,6 @@ double	term (void);
 struct sym	*lookup (char *id, int type, int subs);
 struct sym	*getsym (void);
 
-#ifdef FUNCTIONS
 double	fsin (double arg);
 double	fcos (double arg);
 double	fexp (double arg);
@@ -31,7 +30,6 @@ double	fabt (double arg);
 double	fsgn (double arg);
 double	fitr (double arg);
 double	fran (double arg);
-#endif
 
 void	library (void);
 void	catchcc (void);
