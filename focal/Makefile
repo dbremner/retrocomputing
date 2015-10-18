@@ -4,7 +4,7 @@
 #CC = cc
 #CFLAGS = -O -DDIR_SUPPORT -DDIRENT
 CC = gcc
-CFLAGS	= -O -g -Wall -DDIR_SUPPORT -DDIRENT
+CFLAGS	= -O -g -Wall -Wextra -pedantic -DDIR_SUPPORT -DDIRENT
 
 OBJECTS	= \
 	focal0.o \
