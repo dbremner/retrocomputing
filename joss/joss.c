@@ -68,7 +68,7 @@ main()
 
 
 int
-read_line( char *prompt)
+read_line( const char *prompt)
 {
    int len;
 

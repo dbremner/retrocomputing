@@ -16,7 +16,7 @@ extern "C" void exit(int);
  *  EXPR
  */
 
-expr::expr( char *s)
+expr::expr( const char *s)
 {
    strcpy( symbol, s);
    value.f = 0.0;
@@ -82,7 +82,7 @@ expr::copy()
 
 
 expr *
-expr::find( char *s)
+expr::find( const char *s)
 {
    expr *p;
 
@@ -111,7 +111,7 @@ expr::hd()
 
 
 int
-expr::is( char *s)
+expr::is( const char *s)
 {
    if (strcmp( symbol, s) == 0)
       return(1);
@@ -119,7 +119,7 @@ expr::is( char *s)
 }
 
 int
-expr::is2( char *s1, char *s2)
+expr::is2( const char *s1, const char *s2)
 {
    if (strcmp( symbol, s1) == 0
     && strcmp( next->symbol, s2) == 0)
@@ -128,7 +128,7 @@ expr::is2( char *s1, char *s2)
 }
 
 int
-expr::is3( char *s1, char *s2, char *s3)
+expr::is3( const char *s1, const char *s2, const char *s3)
 {
    if (strcmp( symbol, s1) == 0
     && strcmp( next->symbol, s2) == 0

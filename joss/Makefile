@@ -1,6 +1,7 @@
 # Makefile for the JOSS implementation.
 
 CC = g++ 
+CFLAGS = -Wall -Wextra
 
 joss : joss.o parse.o eval.o josssubs.o Makefile
 	$(CC) $(CFLAGS) -o joss joss.o parse.o eval.o josssubs.o -lm

@@ -168,7 +168,7 @@ eval( expr *s, double *x_result, int *i_result)
    else if (s->is( "call"))
    {
       int num_args, num_x_stack;
-      auto double x_stack[10];
+      double x_stack[10];
 
       v = find_var( s->value.i);
       if (v->type == (-1))
@@ -1056,7 +1056,7 @@ eval( expr *s, double *x_result, int *i_result)
 
 
 void
-eval_error( char *s)
+eval_error( const char *s)
 {
    if (pc == SNULL)
       printf( "  Evaluation error: %s\n", s);
@@ -1070,7 +1070,7 @@ eval_error( char *s)
 
 
 int
-eval_iter( expr *s, expr *t, double *x_result, int *i_result, char *symbol)
+eval_iter( expr *s, expr *t, double *x_result, int *i_result, const char *symbol)
 {
    expr *p, *q;
    double x_start, x_inc, x_end, x_cur;
@@ -1078,7 +1078,7 @@ eval_iter( expr *s, expr *t, double *x_result, int *i_result, char *symbol)
    int i, action, num_iter;
    vars *v;
 
-   static char *symbols[] = {
+   static const char *symbols[] = {
       "conj", "disj", "first", "for", "max", "min", "prod", "sum", NULL
    };
 

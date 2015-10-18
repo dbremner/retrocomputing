@@ -1379,7 +1379,7 @@ alter_function (expr *f, int num_args, char *var_list)
 
 
 void
-parse_error( int pos, char *message)
+parse_error( int pos, const char *message)
 {
    static char line[LINE_LEN];
    int i, n;

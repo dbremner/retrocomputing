@@ -26,15 +26,15 @@ public:
    } value;
    int pos;
 
-   expr( char *);
+   expr( const char *);
    void append( expr *);
    expr *copy();
-   expr *find( char *);
+   expr *find( const char *);
    void init_head();
    int hd();
-   int is( char *);
-   int is2( char *, char *);
-   int is3( char *, char *, char *);
+   int is( const char *);
+   int is2( const char *, const char *);
+   int is3( const char *, const char *, const char *);
 };
 
 #define ENULL ((expr *) NULL)
@@ -151,9 +151,9 @@ void alter_function( expr *f, int num_args, char *var_list);
 void delete_exp( expr *e);
 int demand( char *prompt, double *x);
 int eval( expr *s, double *x_result, int *i_result);
-void eval_error( char *s);
+void eval_error( const char *s);
 int eval_iter( expr *s, expr *t, double *x_result, int *i_result,
-               char *symbol);
+               const char *symbol);
 element *eval_ref( expr *s, int demand_switch, char *prompt);
 vars *find_var( int name);
 void init_eval();
@@ -162,8 +162,8 @@ void init_vars();
 void join( expr *e1, expr *e2);
 void join_down( expr *e1, expr *e2);
 int parse( int goal, expr *e);
-void parse_error( int pos, char *message);
-int read_line( char *prompt);
+void parse_error( int pos, const char *message);
+int read_line( const char *prompt);
 int scan();
 void short_display( expr *e, char *s);
 expr *split( expr *e);
