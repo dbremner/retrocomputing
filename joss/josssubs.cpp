@@ -211,31 +211,38 @@ forms::set( int i, char *fs)
       {
          if (*(t+1) == '\\')
          {
-            *s++ = *t++;  continue;
+            *s++ = *t++;
+            continue;
          }
          if (*(t+1) == 'n')
          {
-            *s++ = '\015';   *s++ = '\012';   t++;
+            *s++ = '\015';
+            *s++ = '\012';
+            t++;
             continue;
          }
          if (*(t+1) == 'f')
          {
-            *s++ = '\014';   t++;
+            *s++ = '\014';
+            t++;
             continue;
          }
          if (*(t+1) == 't')
          {
-            *s++ = '\011';   t++;
+            *s++ = '\011';
+            t++;
             continue;
          }
       }
 
       if (*t == '%' && *(t+1) == '%')
       {
-         *s++ = *t++;  continue;
+         *s++ = *t++;
+         continue;
       }
 
-      if (*t == '%') f[i-1].num_args++;
+      if (*t == '%')
+        f[i-1].num_args++;
       *s++ = *t;
    }
    *s = '\0';
@@ -491,10 +498,13 @@ vars::init( int var_name)
 {
    formula[0] = '\0';
 
-   name = var_name;   type = -1;
-   value = 0.0;   num_args = 0;
+   name = var_name;
+   type = -1;
+   value = 0.0;
+   num_args = 0;
 
-   f = nullptr;   e_list = nullptr;
+   f = nullptr;
+   e_list = nullptr;
 }
 
 
@@ -597,10 +607,14 @@ vars::find_element( int j1, int j2, int demand_switch, char *prompt)
    if (new_element)
    {
       u = new element();
-      u->value = x;   u->next = v;
-      u->i1 = j1;     u->i2 = j2;
-      if (t == nullptr) e_list = u;
-      else t->next = u;
+      u->value = x;
+      u->next = v;
+      u->i1 = j1;
+      u->i2 = j2;
+      if (t == nullptr)
+        e_list = u;
+      else
+        t->next = u;
       v = u;
    }
 
@@ -619,16 +633,19 @@ vars::clear()
         e1 != nullptr;
         e1 = e2)
    {
-      e2 = e1->next;   e1->next = nullptr;
+      e2 = e1->next;
+      e1->next = nullptr;
       delete e1;
    }
 
    if (f != nullptr)
    {
-      delete_exp( f);   f = nullptr;
+      delete_exp( f);
+      f = nullptr;
    }
 
-   type = (-1);   value = 0.0;
+   type = (-1);
+   value = 0.0;
    formula[0] = '\0';
 }
 
@@ -697,7 +714,8 @@ delete_exp( expr *e)
    while (e != nullptr)
    {
       f = e->next;
-      e->next = e->back = nullptr;
+      e->next = nullptr;
+      e->back = nullptr;
       if (e->is( "string") || e->is( "name"))
       {
          if (e->value.s != nullptr) delete e->value.s;
@@ -753,11 +771,16 @@ join( expr *e1, expr *e2)
 
    if (e2->next == e2) return;
 
-   f1 = e1->back;   f2 = e2->back;
-   f1->next = e2->next;   e2->next->back = f1;
-   f2->next = e1;   e1->back = f2;
+   f1 = e1->back;
+   f2 = e2->back;
+   f1->next = e2->next;
+   e2->next->back = f1;
+   f2->next = e1;
+   e1->back = f2;
 
-   e2->next = e2->back = e2->down = nullptr;
+   e2->next = nullptr;
+   e2->back = nullptr;
+   e2->down = nullptr;
    delete e2;
 }
 
@@ -774,8 +797,10 @@ join_down( expr *e1, expr *e2)
 
    if (e2->next == e2) return;
 
-   if (e1->down == nullptr) e1->down = e2;
-   else join( e1->down, e2);
+   if (e1->down == nullptr)
+     e1->down = e2;
+   else 
+     join( e1->down, e2);
 }
 
 
@@ -790,12 +815,15 @@ short_display( expr *e, char *s)
          || e->is( "var"))
    {
       strncpy( s, e->symbol.c_str(), 3);
-      s[3] = ':';   s[4] = e->value.i;   s[5] = '\0';
+      s[3] = ':';
+      s[4] = e->value.i;
+      s[5] = '\0';
    }
    else if (e->is( "stack"))
    {
       strncpy( s, "stk:", 4);
-      s[4] = '0' + e->value.i;   s[5] = '\0';
+      s[4] = '0' + e->value.i;
+      s[5] = '\0';
    }
    else
    {
@@ -821,9 +849,12 @@ split( expr *q)
    }
    else
    {
-      new_head->next = q;   q->back = new_head;
-      new_head->back = r;   r->next = new_head;
-      head->back = p;       p->next = head;
+      new_head->next = q;
+      q->back = new_head;
+      new_head->back = r;
+      r->next = new_head;
+      head->back = p;
+      p->next = head;
    }
 
    return( new_head);
@@ -835,10 +866,13 @@ split_at( expr *e)
 {
    expr *p, *q;
 
-   if (e->next->hd()) q = nullptr;
-   else q = split( e->next);
+   if (e->next->hd())
+     q = nullptr;
+   else
+     q = split( e->next);
 
-   p = split( e);   delete_exp( p);
+   p = split( e);
+   delete_exp( p);
    return q;
 }
 
@@ -848,7 +882,8 @@ split_down( expr *e)
 {
    expr *f;
 
-   f = e->down;  e->down = nullptr;
+   f = e->down;
+   e->down = nullptr;
    return f;
 }
 

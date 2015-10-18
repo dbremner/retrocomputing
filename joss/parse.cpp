@@ -93,7 +93,8 @@ scan()
          e->value.s = new fstring();
          e->pos = s - cur_line;
 
-         t = ++s;   s =  e->value.s->c;
+         t = ++s;
+         s =  e->value.s->c;
          while (*t != '\0' && *t != '"')
             *s++ = *t++;
          *s = '\0';
@@ -101,7 +102,8 @@ scan()
          if (*t == '\0')
          {
             parse_error( t-cur_line, "Scan error: unclosed string.");
-            delete e->value.s;   delete e;
+            delete e->value.s;
+            delete e;
             return 0;
          }
          s = ++t;
@@ -111,7 +113,8 @@ scan()
          e = new expr( "number");
          e->pos = s - cur_line;
 
-         x = 0.0;   exp = 0;
+         x = 0.0;
+         exp = 0;
          while (*s >= '0' && *s <= '9')
          {
             x = 10.0 * x + (double) (*s - '0');
@@ -123,7 +126,8 @@ scan()
             while( *s >= '0' && *s <= '9')
             {
                x = 10.0 * x + (double) (*s - '0');
-               s++;   exp++;
+               s++;
+               exp++;
             }
          }
          e->value.f = x;
@@ -241,7 +245,8 @@ parse( int goal, expr *s)
             {
                if (q->is( "(" /* ) */ ) || q->is( "[" /* ] */ ))
                {
-                  p = q;   continue;
+                  p = q;
+                  continue;
                }
 
                if (q->is( /* ( */ ")") || q->is( /* [ */ "]")) break;
@@ -313,7 +318,8 @@ parse( int goal, expr *s)
                PERROR( p, "Incomplete if, for, or while statement.")
             }
 
-            pb = split( p->next);   p = split( p);
+            pb = split( p->next);
+            p = split( p);
             pa = split( s->next);
             join( s, p);
 
@@ -328,7 +334,8 @@ parse( int goal, expr *s)
                PARSE2( PREDICATE, pb, pa, pb)
             }
 
-            join( pb, pa);   join_down( s->next, pb);
+            join( pb, pa);
+            join_down( s->next, pb);
             return 1;
          }
 
@@ -359,8 +366,11 @@ parse( int goal, expr *s)
                PERROR( p->next, "Error in Form statement.")
 
             q = split( s->back);
-            p = split( s->back);   delete_exp( p);
-            p = split( s->back);   join( p, q);   join_down( s->next, p);
+            p = split( s->back);
+            delete_exp( p);
+            p = split( s->back);
+            join( p, q);
+            join_down( s->next, p);
             return 1;
          }
 
@@ -381,7 +391,8 @@ parse( int goal, expr *s)
                p->back->symbol = "Dopart";
             else
                p->back->symbol = "Dostep";
-            p = split( p);   delete_exp(p);
+            p = split( p);
+            delete_exp(p);
 
             PARSE1( EXPRESSION, q, q)
             join_down( s->next, q);
@@ -478,7 +489,8 @@ parse( int goal, expr *s)
               for (p = s->next;   !p->hd(); p = p->next)
                 if (p->is2( "in", "form"))
                 {
-                    q = p;   break;
+                    q = p;
+                    break;
                 }
 
             /* Parse 2 found. */
@@ -496,7 +508,8 @@ parse( int goal, expr *s)
 
                PARSE2( EXPRESSION, q, p, q)
 
-               join( q, p);   join_down( s->next, q);
+               join( q, p);
+               join_down( s->next, q);
                return 1;
             }
 
@@ -807,7 +820,8 @@ parse( int goal, expr *s)
             PARSE2( PREDICATE, pa, pa, pb)
             PARSE2( PREDICATE, pb, pa, pb)
 
-            join( pa, pb);   join_down( s->next, pa);
+            join( pa, pb);
+            join_down( s->next, pa);
             return 1;
          }
 
@@ -815,7 +829,8 @@ parse( int goal, expr *s)
          {
             p = split( s->next->next);
             PARSE1( PREDICATE, p, p)
-            join_down( s->next, p);   return 1;
+            join_down( s->next, p);
+            return 1;
          }
 
          /*  Look for predicates in parentheses */
@@ -1070,7 +1085,8 @@ parse( int goal, expr *s)
             {
                if (q->is( "(|" /* ) */ ))
                {
-                  p = q;   continue;
+                  p = q;
+                  continue;
                }
                if (q->is( /* ( */ "|)" )) break;
             }
@@ -1173,7 +1189,8 @@ parse( int goal, expr *s)
 
             PARSE2( SUBEXPRESSION, pa, pa, pb)
             PARSE2( SUBEXPRESSION, pb, pa, pb)
-            join( pa, pb);   join_down( s->next, pa);
+            join( pa, pb);
+            join_down( s->next, pa);
             return 1;
          }
 
@@ -1208,7 +1225,8 @@ parse( int goal, expr *s)
 
             PARSE2( SUBEXPRESSION, pa, pa, pb)
             PARSE2( SUBEXPRESSION, pb, pa, pb)
-            join( pa, pb);   join_down( s->next, pa);
+            join( pa, pb);
+            join_down( s->next, pa);
             return 1;
          }
 
@@ -1227,7 +1245,8 @@ parse( int goal, expr *s)
 
             PARSE2( SUBEXPRESSION, pa, pa, pb)
             PARSE2( SUBEXPRESSION, pb, pa, pb)
-            join( pa, pb);   join_down( s->next, pa);
+            join( pa, pb);
+            join_down( s->next, pa);
             return 1;
          }
 

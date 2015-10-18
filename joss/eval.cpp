@@ -102,7 +102,8 @@ init_vars()
 void
 init_eval()
 {
-   pc = pc_next = nullptr;
+   pc = nullptr;
+   pc_next = nullptr;
    num_stack = 0;
 }
 
@@ -149,7 +150,8 @@ eval( expr *s, double *x_result, int *i_result)
       EVAL( p)
       if (i == 0)
       {
-        *i_result = 0;   return 1;
+        *i_result = 0;
+        return 1;
       }
       p = p->next;
       EVAL( p)
@@ -162,7 +164,8 @@ eval( expr *s, double *x_result, int *i_result)
       p = s->down->next;
       EVAL( p)
       y = x;   EVAL(p->next)
-      *x_result = y - x;   return 1;
+      *x_result = y - x;
+      return 1;
    }
 
    else if (s->is( "call"))
@@ -434,7 +437,8 @@ eval( expr *s, double *x_result, int *i_result)
 
       EVAL( s->down->next)
       part = 1000 * int (x + 0.5);
-      save_pc = pc;   save_pc_next = pc_next;
+      save_pc = pc;
+      save_pc_next = pc_next;
       pc = S.get_next( part-1);
 
       while (pc != nullptr)
@@ -458,7 +462,8 @@ eval( expr *s, double *x_result, int *i_result)
 
       EVAL( s->down->next)
       i = (int) (x * 1000.0 + 0.5);
-      save_pc = pc;   save_pc_next = pc_next;
+      save_pc = pc;
+      save_pc_next = pc_next;
       pc1 = S.get( i);
       if (pc1 == nullptr)
       {
@@ -468,7 +473,8 @@ eval( expr *s, double *x_result, int *i_result)
       pc = pc1;
 
       EVAL( pc->e)
-      pc = save_pc;   pc_next = save_pc_next;
+      pc = save_pc;
+      pc_next = save_pc_next;
       return 1;
    }
 
@@ -477,7 +483,8 @@ eval( expr *s, double *x_result, int *i_result)
       EVAL( s->down)
       if (s->is( "exp"))
       {
-         *x_result = exp( x);   return 1;
+         *x_result = exp( x);
+         return 1;
       }
       *x_result = (float) (int) x;
       if (s->is( "flr") && *x_result > x) *x_result -= 1.0;
@@ -489,7 +496,8 @@ eval( expr *s, double *x_result, int *i_result)
    {
       step *save_pc, *save_pc_next;
 
-      save_pc = pc;   save_pc_next = pc_next;
+      save_pc = pc;
+      save_pc_next = pc_next;
       pc = S.get_next( -1);
 
       while (pc != nullptr)
@@ -500,7 +508,8 @@ eval( expr *s, double *x_result, int *i_result)
          EVAL( p)
          pc = pc_next;
       }
-      pc = save_pc;   pc_next = save_pc_next;
+      pc = save_pc;
+      pc_next = save_pc_next;
       return 1;
    }
 
@@ -557,27 +566,33 @@ eval( expr *s, double *x_result, int *i_result)
 
          if (p->is( "<") && !(y < x))
          {
-            *i_result = 0;   return 1;
+            *i_result = 0;
+            return 1;
          }
          else if (p->is( "<=") && !(y <= x))
          {
-            *i_result = 0;   return 1;
+            *i_result = 0;
+            return 1;
          }
          else if (p->is( ">") && !(y > x))
          {
-            *i_result = 0;   return 1;
+            *i_result = 0;
+            return 1;
          }
          else if (p->is( ">=") && !(y >= x))
          {
-            *i_result = 0;   return 1;
+            *i_result = 0;
+            return 1;
          }
          else if (p->is( "=") && !(y == x))
          {
-            *i_result = 0;   return 1;
+            *i_result = 0;
+            return 1;
          }
          else if (p->is( "~=") && !(y != x))
          {
-            *i_result = 0;   return 1;
+            *i_result = 0;
+            return 1;
          }
       }
       return 1;
@@ -590,7 +605,8 @@ eval( expr *s, double *x_result, int *i_result)
       {
          expr *qa, *r;
 
-         q = p->next;   r = q->next;
+         q = p->next;
+         r = q->next;
 
          if (!p->is( "name"))
             EVALERROR( "Bad function definition.")
@@ -1018,7 +1034,8 @@ eval( expr *s, double *x_result, int *i_result)
       p = s->down->next;
       EVAL( p)
       y = x;   EVAL(p->next)
-      *x_result = x + y;   return 1;
+      *x_result = x + y;
+      return 1;
    }
 
    else if (s->is( "*"))
@@ -1026,7 +1043,8 @@ eval( expr *s, double *x_result, int *i_result)
       p = s->down->next;
       EVAL( p)
       y = x;   EVAL(p->next)
-      *x_result = y * x;   return 1;
+      *x_result = y * x;
+      return 1;
    }
 
    else if (s->is( "/"))
@@ -1036,7 +1054,8 @@ eval( expr *s, double *x_result, int *i_result)
       y = x;   EVAL(p->next)
       if (x == 0.0)
          EVALERROR( "Divide by zero error.")
-      *x_result = y / x;   return 1;
+      *x_result = y / x;
+      return 1;
    }
 
    else if (s->is( "^"))
@@ -1044,7 +1063,8 @@ eval( expr *s, double *x_result, int *i_result)
       p = s->down->next;
       EVAL( p)
       y = x;   EVAL(p->next)
-      *x_result = pow( y, x);   return 1;
+      *x_result = pow( y, x);
+      return 1;
    }
 
    else
@@ -1134,21 +1154,24 @@ eval_iter( expr *s, expr *t, double *x_result, int *i_result, const std::string 
             case 0: /* conj */
                if (i == 0)
                {
-                  *i_result = 0;   return 1;
+                  *i_result = 0;
+                  return 1;
                }
                break;
 
             case 1: /* disj */
                if (i == 1)
                {
-                  *i_result = 1;   return 1;
+                  *i_result = 1;
+                  return 1;
                }
                break;
 
             case 2: /* first */
                if (i == 1)
                {
-                  *x_result = x_cur;   return 1;
+                  *x_result = x_cur;
+                  return 1;
                }
                break;
 
@@ -1156,11 +1179,13 @@ eval_iter( expr *s, expr *t, double *x_result, int *i_result, const std::string 
                break;
 
             case 4: /* max */
-               if (num_iter == 0 || x > *x_result) *x_result = x;
+               if (num_iter == 0 || x > *x_result)
+                 *x_result = x;
                break;
 
             case 5: /* min */
-               if (num_iter == 0 || x < *x_result) *x_result = x;
+               if (num_iter == 0 || x < *x_result)
+                 *x_result = x;
                break;
 
             case 6: /* prod */
@@ -1214,7 +1239,8 @@ eval_ref( expr *s, int demand_switch, char *prompt)
    }
 
    if (!eval( s, &x, &i)) return nullptr;
-   i1 = (int) (x + 0.5);   i2 = 0;
+   i1 = (int) (x + 0.5);
+   i2 = 0;
    if (num_args == 2)
    {
       if (!eval( s->next, &x, &i)) return nullptr;
