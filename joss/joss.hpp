@@ -109,11 +109,11 @@ public:
 
 class element {
 public:
-   element *next;
-   int i1, i2;
-   double value;
+   element *next=nullptr;
+   int i1=0, i2=0;
+   double value=0.0;
 
-   element();
+   element() = default;
 };
 
 /*
@@ -124,12 +124,12 @@ public:
 class vars {
    char formula[LINE_LEN];
 public:
-   int name;
-   int type;
-   int num_args;
-   double value;
-   expr *f;
-   element *e_list;
+   int name = 'a';
+   int type = -1;
+   int num_args = 0;
+   double value = 0.0;
+   expr *f = nullptr;
+   element *e_list = nullptr;
    fstring line;
 
    vars();

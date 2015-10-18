@@ -475,14 +475,6 @@ steps::next( step *s)
 }
 
 
-element::element()
-{
-   next = nullptr;
-   i1 = i2 = 0;
-   value = 0.0;
-}
-
-
 /*
  *    VARS
  */
@@ -491,10 +483,6 @@ element::element()
 vars::vars()
 {
    formula[0] = '\0';
-
-   name = 'a';   type = -1;
-   value = 0.0;  num_args = 0;
-   f = nullptr;    e_list = nullptr;
 }
 
 
