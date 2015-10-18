@@ -60,7 +60,7 @@ void getlno(struct lno *lnop, int c)
 		lnop->ln_type = LN_GRP;
 		return;
 	}
-	if (ln<1 | ln>99)
+	if (ln<1 || ln>99)
 		diag(badlno);
 	lnop->ln_gno = gn;
 	lnop->ln_lno = ln;
