@@ -206,43 +206,37 @@ getsym(void)
 
 #ifdef FUNCTIONS
 double
-fsin(arg)
-double arg;
+fsin(double arg)
 {
 	return (sin(arg));
 }
 
 double
-fcos(arg)
-double arg;
+fcos(double arg)
 {
 	return (cos(arg));
 }
 
 double
-fexp(arg)
-double arg;
+fexp(double arg)
 {
 	return (exp(arg));
 }
 
 double
-flog(arg)
-double arg;
+flog(double arg)
 {
 	return (log(arg));
 }
 
 double
-fatn(arg)
-double arg;
+fatn(double arg)
 {
 	return (atan(arg));
 }
 
 double
-fsqt(arg)
-double arg;
+fsqt(double arg)
 {
 	if (arg < 0.0)
 		diag("Fsqt < 0.0");
@@ -250,8 +244,7 @@ double arg;
 }
 
 double
-fabt(arg)
-double arg;
+fabt(double arg)
 {
 	if (arg < 0)
 		return (-arg);
@@ -259,8 +252,7 @@ double arg;
 }
 
 double
-fsgn(arg)
-double arg;
+fsgn(double arg)
 {
 	if (arg < 0)
 		return (-1.0);
@@ -268,8 +260,7 @@ double arg;
 }
 
 double
-fitr(arg)
-double arg;
+fitr(double arg)
 {
 	if (arg < 0)
 		return (-floor(-arg));
@@ -279,8 +270,7 @@ double arg;
 }
 
 double
-fran(arg)
-double arg;
+fran(double arg)
 {
 	return (drand48());
 }
