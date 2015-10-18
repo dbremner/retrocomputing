@@ -45,7 +45,7 @@ scan()
       "<=", ">=", "~=", "as", "Do", "Go", "if", "in", "or", "To", "tv",
       "+", "-", "*", "^", "/", "(", ")", "[", "]", "|", ",", ":", ";",
            "=", "<", ">",
-      NULL
+      nullptr
    };
 
    /*  Initialize the expression. */
@@ -67,14 +67,14 @@ scan()
       /*  Look for a reserved word. */
 
       for (i = 0, t = reserved[0];
-           t != NULL;
+           t != nullptr;
            t = reserved[++i])
       {
          len = strlen( t);
          if (strncmp( s, t, len) == 0) break;
       }
 
-      if (t != NULL)
+      if (t != nullptr)
       {
          e = new expr( t);
          e->pos = s - cur_line;
@@ -215,7 +215,7 @@ parse( int goal, expr *s)
       printf( ":\n");
       for (p = s->next;   !p->hd();   p = p->next)
       {
-         printf( "   %s", p->symbol);
+         printf( "   %s", p->symbol.c_str());
       }
       printf( "\n");
    }
@@ -236,7 +236,7 @@ parse( int goal, expr *s)
 
             /*  Look for the innermost parentheses pair. */
 
-            p = ENULL;
+            p = nullptr;
             for (q = s->next;  !q->hd();   q = q->next)
             {
                if (q->is( "(" /* ) */ ) || q->is( "[" /* ] */ ))
@@ -247,11 +247,11 @@ parse( int goal, expr *s)
                if (q->is( /* ( */ ")") || q->is( /* [ */ "]")) break;
             }
 
-            if (q->hd() && p == ENULL) break;
+            if (q->hd() && p == nullptr) break;
 
             if (q->hd())
                PERROR( p, "Unbalanced parentheses.")
-            if (p == ENULL)
+            if (p == nullptr)
                PERROR( q, "Unbalanced parentheses.")
 
             if ((p->is( "(" /* ) */) && q->is(/* [ */ "]"))
@@ -260,16 +260,16 @@ parse( int goal, expr *s)
 
             q = split_at( q);
 
-            if (p->next->hd()) pb = ENULL;
+            if (p->next->hd()) pb = nullptr;
             else pb = split( p->next);
 
             if (p->is( "(" /* ) */ ))
-               strcpy( p->symbol, "()");
+               p->symbol = "()";
             else
-               strcpy( p->symbol, "[]");
+               p->symbol = "[]";
 
-            if (pb != ENULL) join_down( p, pb);
-            if (q != ENULL) join( s, q);
+            if (pb != nullptr) join_down( p, pb);
+            if (q != nullptr) join( s, q);
          }
 
          PARSE( SUBCOMMAND, s)
@@ -303,13 +303,13 @@ parse( int goal, expr *s)
             if (s->next == p)
             {
                sprintf( message, "Statement cannot start with %s.\n",
-                        p->symbol);
+                        p->symbol.c_str());
                PERROR( p, message)
             }
 
             if (p->next == s)
             {
-               sprintf( message, "Incomplete %s statement.", p->symbol);
+               sprintf( message, "Incomplete %s statement.", p->symbol.c_str());
                PERROR( p, "Incomplete if, for, or while statement.")
             }
 
@@ -378,9 +378,9 @@ parse( int goal, expr *s)
 
             q = split( p->next);
             if (p->is( "part"))
-               strcpy( p->back->symbol, "Dopart");
+               p->back->symbol = "Dopart";
             else
-               strcpy( p->back->symbol, "Dostep");
+               p->back->symbol = "Dostep";
             p = split( p);   delete_exp(p);
 
             PARSE1( EXPRESSION, q, q)
@@ -397,9 +397,9 @@ parse( int goal, expr *s)
          {
             p = s->next->next;
             if (p->is( "step"))
-               strcpy( p->back->symbol, "Tostep");
+               p->back->symbol = "Tostep";
             else if (p->is( "part"))
-               strcpy( p->back->symbol, "Topart");
+               p->back->symbol = "Topart";
             else
                PERROR( p, "Form: To step n  or  To part n.")
 
@@ -417,13 +417,13 @@ parse( int goal, expr *s)
          if (s->next->is( "Demand"))
          {
             q = s->next->find( "as");
-            if (q != ENULL)
+            if (q != nullptr)
             {
                q = split_at( q);
                if (!q->next->is2( "string", "head"))
                   PERROR1( q, "String expected.", q)
 
-               strcpy( s->next->symbol, "Demand_as");
+               s->next->symbol = "Demand_as";
                p = split( s->next->next);
                PARSE2( EXPRESSION, p, p, q)
                if (!p->next->is( "var") && !p->next->is( "ref"))
@@ -439,10 +439,10 @@ parse( int goal, expr *s)
             }
 
             p = split( s->next->next);
-            while (p != ENULL)
+            while (p != nullptr)
             {
                q = p->next->find( ",");
-               if (q != ENULL) q = split_at( q);
+               if (q != nullptr) q = split_at( q);
 
                if (!p->next->is2( "var", "head") &&
                    !p->next->is3( "var", "[]", "head"))
@@ -473,7 +473,7 @@ parse( int goal, expr *s)
          {
             /* Look for parse 2. */
 
-            q = ENULL;
+            q = nullptr;
             if (s->next->is( "Type"))
               for (p = s->next;   !p->hd(); p = p->next)
                 if (p->is2( "in", "form"))
@@ -483,13 +483,13 @@ parse( int goal, expr *s)
 
             /* Parse 2 found. */
 
-            if (q != ENULL)
+            if (q != nullptr)
             {
                pb = split( q->next->next);
                delete_exp( split( q));
                q = pb;
 
-               strcpy( s->next->symbol, "Typeinform");
+               s->next->symbol = "Typeinform";
                p = split( s->next->next);
                if (!p->next->hd())
                   PARSE2( EXPLIST, p, p, q)
@@ -503,7 +503,7 @@ parse( int goal, expr *s)
             /* Here for Delete and for Type (parse 1). */
 
             p = split( s->next->next);
-            while (p != ENULL)
+            while (p != nullptr)
             {
                char *name;
                int len;
@@ -517,7 +517,7 @@ parse( int goal, expr *s)
 
                q = p->next->find( ",");
 
-               if (q != ENULL)
+               if (q != nullptr)
                {
                   len = &cur_line[q->pos] - name;
                   q = split_at( q);
@@ -532,27 +532,27 @@ parse( int goal, expr *s)
                }
                else if (p->next->is3( "all", "forms", "head"))
                {
-                  strcpy( p->next->symbol, "allforms");
+                  p->next->symbol = "allforms";
                   delete_exp( split( p->next->next));
                }
                else if (p->next->is3( "all", "formulas", "head"))
                {
-                  strcpy( p->next->symbol, "allformulas");
+                  p->next->symbol = "allformulas";
                   delete_exp( split( p->next->next));
                }
                else if (p->next->is3( "all", "parts", "head"))
                {
-                  strcpy( p->next->symbol, "allparts");
+                  p->next->symbol = "allparts";
                   delete_exp( split( p->next->next));
                }
                else if (p->next->is3( "all", "steps", "head"))
                {
-                  strcpy( p->next->symbol, "allsteps");
+                  p->next->symbol = "allsteps";
                   delete_exp( split( p->next->next));
                }
                else if (p->next->is3( "all", "values", "head"))
                {
-                  strcpy( p->next->symbol, "allvalues");
+                  p->next->symbol = "allvalues";
                   delete_exp( split( p->next->next));
                }
                else if (p->next->is( "form") || p->next->is( "part")
@@ -626,14 +626,14 @@ parse( int goal, expr *s)
             {
                p = split( p);
                q = p->next->find( ",");
-               if (q != ENULL)
+               if (q != nullptr)
                {
                   q = split_at( q);
                   join( s, q);
                }
 
                pa = p->next->find( "=");
-               if (pa == ENULL)
+               if (pa == nullptr)
                   PERROR1( p, "No assignment symbol.", p)
 
                q = split(pa->next);
@@ -641,16 +641,16 @@ parse( int goal, expr *s)
 
                for(;;)
                {
-                  if (q != ENULL && !p->next->is2( "var", "head") &&
+                  if (q != nullptr && !p->next->is2( "var", "head") &&
                       !p->next->is3( "var", "[]", "head"))
        PERROR3( p, "Must assign to a variable or array element.", p, q, pa)
 
                   PARSE2( EXPRESSION, p, q, pa)
                   join_down( pa->next, p);
                   p = q;
-                  if (p == ENULL) break;
+                  if (p == nullptr) break;
                   q = p->next->find( "=");
-                  if (q != ENULL) q = split_at( q);
+                  if (q != nullptr) q = split_at( q);
                }
                join_down( s->next, pa);
                p = s->next->next;
@@ -671,7 +671,7 @@ parse( int goal, expr *s)
                PERROR( s->next, "Let command must be direct.")
 
             p = split( s->next->next);
-            while( p != ENULL)
+            while( p != nullptr)
             {
                char *name;
                int len;
@@ -679,7 +679,7 @@ parse( int goal, expr *s)
                name = &cur_line[p->next->pos];
 
                q = p->next->find( ",");
-               if (q != ENULL)
+               if (q != nullptr)
                {
                   len = q->pos - p->pos;
                   q = split_at( q);
@@ -687,7 +687,7 @@ parse( int goal, expr *s)
                else len = subcommand_end - name + 1;
 
                r = p->next->find( "=");
-               if (r == ENULL)
+               if (r == nullptr)
                   PERROR2( p, "No assignment symbol.", p, q)
                r = split_at( r);
 
@@ -754,7 +754,7 @@ parse( int goal, expr *s)
             return 1;
          }
 
-         if (direct && s->next->find( "=") != ENULL)
+         if (direct && s->next->find( "=") != nullptr)
          {
             /* Treat this as short Set command. */
 
@@ -776,10 +776,10 @@ parse( int goal, expr *s)
       {
          p = split( s->next);
 
-         while (p != ENULL)
+         while (p != nullptr)
          {
             q = p->next->find( ",");
-            if (q != ENULL) q = split_at( q);
+            if (q != nullptr) q = split_at( q);
             PARSE2( PREDICATE, p, p, q)
             join( s, p);
             p = q;
@@ -796,8 +796,8 @@ parse( int goal, expr *s)
          /* Process or, and, not. */
 
          p = s->next->find( "or");
-         if (p == ENULL) p = s->next->find( "and");
-         if (p != ENULL)
+         if (p == nullptr) p = s->next->find( "and");
+         if (p != nullptr)
          {
             pb = split( p->next);
             p = split( p);
@@ -823,7 +823,7 @@ parse( int goal, expr *s)
          if (s->next->is2( "()", "head"))
          {
             p = split_down( s->next);
-            if (p == ENULL)
+            if (p == nullptr)
                PERROR( s->next, "Empty predicate.")
             delete_exp( split( s->next));
             join( s, p);
@@ -838,10 +838,10 @@ parse( int goal, expr *s)
          {
             p = split_down( s->next->next);
             delete_exp( split( s->next->next));
-            if (p == ENULL) return 1;   /* Empty conjunction or disjunction */
+            if (p == nullptr) return 1;   /* Empty conjunction or disjunction */
 
             q = p->next->find( ":");
-            if (q == ENULL)
+            if (q == nullptr)
             {
                PARSE1( PREDLIST, p, p)
                join_down( s->next, p);
@@ -931,12 +931,12 @@ parse( int goal, expr *s)
             if (p->next->hd())
                PERROR1( q, "Incomplete comparison statement.", p)
 
-            if (q->hd()) q = ENULL;
+            if (q->hd()) q = nullptr;
             else q = split( q);
 
             PARSE2( EXPRESSION, p, p, q)
             join_down( s->next, p);
-            if (q == ENULL) break;
+            if (q == nullptr) break;
 
             if (q->next->next->hd())
                PERROR1( q->next, "Incomplete comparison statement.", q)
@@ -958,15 +958,15 @@ parse( int goal, expr *s)
 
          q = split( p->next->next);
          delete_exp( split( p->next));
-         strcpy( p->symbol, "iter");
+         p->symbol = "iter";
 
          /*  Get each range. */
 
          p = q;
-         while (p != ENULL)
+         while (p != nullptr)
          {
             q = p->next->find( ",");
-            if (q != ENULL) q = split_at( q);
+            if (q != nullptr) q = split_at( q);
 
             PARSE2( RANGE, p, p, q)
 
@@ -983,7 +983,7 @@ parse( int goal, expr *s)
       case RANGE:
       {
          p = s->next->find( "<");
-         if (p == ENULL || (q = p->next->find( ">")) == ENULL)
+         if (p == nullptr || (q = p->next->find( ">")) == nullptr)
          {
             PARSE( EXPRESSION, s)
             return 1;
@@ -996,7 +996,7 @@ parse( int goal, expr *s)
 
          q = split_at( q);
 
-         strcpy( p->symbol, "<>");
+         p->symbol = "<>";
          pb = split( p->next);
          p = split( p);
          pa = split( s->next);
@@ -1021,10 +1021,10 @@ parse( int goal, expr *s)
       {
          p = split( s->next);
 
-         while (p != ENULL)
+         while (p != nullptr)
          {
             q = p->next->find( ",");
-            if (q != ENULL) q = split_at(q);
+            if (q != nullptr) q = split_at(q);
 
             PARSE2( EXPRESSION, p, p, q)
             join( s, p);
@@ -1053,9 +1053,9 @@ parse( int goal, expr *s)
                p = q->back;
                if (p->is( "var") || p->is( "number") || p->is( "string")
                 || p->is( "()")  || p->is( "[]")  || p->is( /* ( */ "|)" ))
-                  strcpy( q->symbol, (q->is( "|") ? /* ( */ "|)" : "b-"));
+                  q->symbol = (q->is( "|") ? /* ( */ "|)" : "b-");
                else
-                  strcpy( q->symbol, (q->is( "|") ? "(|" /* ) */ : "u-"));
+                  q->symbol = (q->is( "|") ? "(|" /* ) */ : "u-");
             }
          }
 
@@ -1065,7 +1065,7 @@ parse( int goal, expr *s)
 
          for(;;)
          {
-            p = ENULL;
+            p = nullptr;
             for (q = s->next;   !q->hd();   q = q->next)
             {
                if (q->is( "(|" /* ) */ ))
@@ -1075,8 +1075,8 @@ parse( int goal, expr *s)
                if (q->is( /* ( */ "|)" )) break;
             }
 
-            if (p == ENULL && q->hd()) break;
-            if (p == ENULL)
+            if (p == nullptr && q->hd()) break;
+            if (p == nullptr)
                PERROR( q, "Unbalanced absolute value bars.")
             if (q->hd())
                PERROR( p, "Unbalanced absolute value bars.")
@@ -1084,7 +1084,7 @@ parse( int goal, expr *s)
             q = split_at( q);
 
             pb = split( p->next);
-            strcpy( p->symbol, "abs");
+            p->symbol = "abs";
             join_down( p, pb);
             join( s, q);
          }
@@ -1114,11 +1114,11 @@ parse( int goal, expr *s)
          if (s->next->is2( "()", "head"))
          {
             p = split_down( s->next);
-            if (p == ENULL)
+            if (p == nullptr)
                PERROR( s->next, "Empty expression.")
 
             q = p->next->find( ":");
-            if (q == ENULL)
+            if (q == nullptr)
             {
                delete_exp( split( s->next));
                join( s, p);
@@ -1126,12 +1126,12 @@ parse( int goal, expr *s)
                return 1;
             }
 
-            strcpy( s->next->symbol, "cond");
-            while (p != ENULL)
+            s->next->symbol = "cond";
+            while (p != nullptr)
             {
                q = p->next->find( ":");
 
-               if (q == ENULL)
+               if (q == nullptr)
                {
                   PARSE1( EXPRESSION, p, p)
                }
@@ -1143,10 +1143,10 @@ parse( int goal, expr *s)
 
                join_down( s->next, p);
                p = q;
-               if (p == ENULL) break;
+               if (p == nullptr) break;
 
                q = p->next->find( ";");
-               if (q != ENULL) q = split_at( q);
+               if (q != nullptr) q = split_at( q);
 
                PARSE2( EXPRESSION, p, p, q)
                join_down( s->next, p);
@@ -1215,7 +1215,7 @@ parse( int goal, expr *s)
          /* Exponentiation */
 
          p = s->next->find( "^");
-         if (p != ENULL)
+         if (p != nullptr)
          {
             pb = split( p->next);
             p = split( p);
@@ -1236,7 +1236,7 @@ parse( int goal, expr *s)
          p = s->next;
          if (p->is2( "abs", "head"))
          {
-            if (p->down == ENULL)
+            if (p->down == nullptr)
                PERROR( p, "Syntax error in expression.")
             PARSE( SUBEXPRESSION, p->down)
             return 1;
@@ -1250,16 +1250,16 @@ parse( int goal, expr *s)
              p->is3( "var", "()", "head"))
          {
             if (p->next->is( "()"))
-               strcpy( p->symbol, "call");
+               p->symbol = "call";
             else
-               strcpy( p->symbol, "ref");
+               p->symbol = "ref";
 
             q = split_down( p->next);
-            if (q == ENULL && p->is( "ref"))
+            if (q == nullptr && p->is( "ref"))
                PERROR( p->next, "Array ref must have one or two indices.")
 
             delete_exp( split( p->next));
-            if (q != ENULL)
+            if (q != nullptr)
             {
                PARSE1( EXPLIST, q, q)
                join_down( p, q);
@@ -1280,7 +1280,7 @@ parse( int goal, expr *s)
           || p->is( "tan"))
          {
             q = split_down( p->next);
-            if (q == ENULL)
+            if (q == nullptr)
                PERROR( p->next, "No argument for this function.")
 
             delete_exp( split( p->next));
@@ -1294,7 +1294,7 @@ parse( int goal, expr *s)
           || p->is( "prod") || p->is( "first"))
          {
             p = split_down( p->next);
-            if (p == ENULL)
+            if (p == nullptr)
             {
                if (s->next->is( "max") || s->next->is( "min")
                 || s->next->is( "first"))
@@ -1304,7 +1304,7 @@ parse( int goal, expr *s)
             }
 
             q = p->next->find( ":");
-            if (q == ENULL)
+            if (q == nullptr)
             {
                if (s->next->is( "first"))
     PERROR1( s->next->next, "The 'first' function must have an iteration.", p)
@@ -1335,7 +1335,7 @@ parse( int goal, expr *s)
          if (p->is3( "tv", "()", "head"))
          {
             q = split_down( p->next);
-            if (q == ENULL)
+            if (q == nullptr)
                PERROR( p->next, "Predicate required for the tv function.")
 
             delete_exp( split( p->next));
@@ -1363,7 +1363,7 @@ alter_function (expr *f, int num_args, char *var_list)
 
    for (f = f->next; !f->hd(); f = f->next)
    {
-      if (f->down != ENULL)
+      if (f->down != nullptr)
          alter_function( f->down, num_args, var_list);
       if (!f->is( "var")) continue;
 
@@ -1371,7 +1371,7 @@ alter_function (expr *f, int num_args, char *var_list)
       {
          if (var_list[i] != f->value.i) continue;
          f->value.i = num_args - 1 - i;
-         strcpy( f->symbol, "stack");
+         f->symbol = "stack";
          break;
       }
    }

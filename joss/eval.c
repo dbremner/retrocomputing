@@ -61,7 +61,7 @@ tree_print( int level, expr *e)
       strncpy( &lines[level*LINE_LEN + cursor], buf, len);
       cursor += len;
 
-      if (e->down != ENULL)
+      if (e->down != nullptr)
          tree_print( level+1, e->down);
       else if (!e->next->hd())
          cursor++;
@@ -102,7 +102,7 @@ init_vars()
 void
 init_eval()
 {
-   pc = pc_next = SNULL;
+   pc = pc_next = nullptr;
    num_stack = 0;
 }
 
@@ -116,7 +116,7 @@ eval( expr *s, double *x_result, int *i_result)
    vars *v;
    static char message[80];
 
-   if (s == ENULL)
+   if (s == nullptr)
       EVALERROR( "Evaluator called with a null expression.")
 
    if (s->hd()) s = s->next;
@@ -185,7 +185,7 @@ eval( expr *s, double *x_result, int *i_result)
       /*  Check that the number of arguments are the same. */
 
       num_args = 0;
-      if (s->down != ENULL)
+      if (s->down != nullptr)
       {
          for (p = s->down->next; !p->hd(); p = p->next) num_args++;
       }
@@ -250,7 +250,7 @@ eval( expr *s, double *x_result, int *i_result)
    else if (s->is( "conj") || s->is( "disj"))
    {
       *i_result = (s->is( "conj") ? 1 : 0);
-      if (s->down == ENULL) return 1;
+      if (s->down == nullptr) return 1;
       p = s->down->next;
 
       if (p->is( "iter"))
@@ -339,7 +339,7 @@ eval( expr *s, double *x_result, int *i_result)
             EVAL( p->down->next)
             part = 1000 * (int) (x + 0.5);
             st = S.get_next( part-1);
-            while (st != SNULL)
+            while (st != nullptr)
             {
                if (st->step_number < part || st->step_number >= part+1000)
                   break;
@@ -353,7 +353,7 @@ eval( expr *s, double *x_result, int *i_result)
             EVAL( p->down->next)
             i = (int) (x * 1000.0 + 0.5);
             st = S.get( i);
-            if (st == SNULL)
+            if (st == nullptr)
                printf( "     Step %-.3f is undefined.\n", (float) x);
             else
                st = S.remove( st);
@@ -365,7 +365,7 @@ eval( expr *s, double *x_result, int *i_result)
          }
          else
          {
-            sprintf( message, "Cannot delete %s.", p->symbol);
+            sprintf( message, "Cannot delete %s.", p->symbol.c_str());
             EVALERROR( message)
          }
       }
@@ -384,12 +384,12 @@ eval( expr *s, double *x_result, int *i_result)
             v = find_var( p->value.i);
             v->clear();
             v->type = -1;
-            v->get_value( &x, NULL);
+            v->get_value( &x, nullptr);
          }
          else if (p->is( "ref"))
          {
-            el = eval_ref( p, 2, NULL);
-            if (el == ELNULL) return 0;
+            el = eval_ref( p, 2, nullptr);
+            if (el == nullptr) return 0;
          }
          else
             EVALERROR( "You can demand only variables or array elements.")
@@ -414,7 +414,7 @@ eval( expr *s, double *x_result, int *i_result)
          element *el;
 
          el = eval_ref( p, 2, p->next->value.s->c);
-         if (el == ELNULL) return 0;
+         if (el == nullptr) return 0;
          return 1;
       }
 
@@ -423,7 +423,7 @@ eval( expr *s, double *x_result, int *i_result)
 
    else if (s->is( "Done"))
    {
-      pc_next = SNULL;
+      pc_next = nullptr;
       return 1;
    }
 
@@ -437,7 +437,7 @@ eval( expr *s, double *x_result, int *i_result)
       save_pc = pc;   save_pc_next = pc_next;
       pc = S.get_next( part-1);
 
-      while (pc != SNULL)
+      while (pc != nullptr)
       {
          if (pc->step_number < part || pc->step_number >= part + 1000)
             break;
@@ -460,7 +460,7 @@ eval( expr *s, double *x_result, int *i_result)
       i = (int) (x * 1000.0 + 0.5);
       save_pc = pc;   save_pc_next = pc_next;
       pc1 = S.get( i);
-      if (pc1 == SNULL)
+      if (pc1 == nullptr)
       {
          sprintf( message, "Cannot do step %-.3f -- undefined.", (float) x);
          EVALERROR( message)
@@ -492,7 +492,7 @@ eval( expr *s, double *x_result, int *i_result)
       save_pc = pc;   save_pc_next = pc_next;
       pc = S.get_next( -1);
 
-      while (pc != SNULL)
+      while (pc != nullptr)
       {
          p = pc->e;
          pc_next = S.next( pc);
@@ -604,7 +604,7 @@ eval( expr *s, double *x_result, int *i_result)
 
          v->num_args = 0;
          qa = q->down;
-         if (q->is( "call") && qa != ENULL)
+         if (q->is( "call") && qa != nullptr)
             for (qa = qa->next; !qa->hd(); qa = qa->next) v->num_args++;
 
          r = split( r);
@@ -678,7 +678,7 @@ eval( expr *s, double *x_result, int *i_result)
    else if (s->is( "prod") || s->is( "sum"))
    {
       *x_result = (s->is( "prod") ? 1.0 : 0.0);
-      if (s->down == ENULL) return 1;
+      if (s->down == nullptr) return 1;
       p = s->down->next;
 
       if (p->is( "iter"))
@@ -699,8 +699,8 @@ eval( expr *s, double *x_result, int *i_result)
       element *el;
 
       v = find_var( s->value.i);
-      el = eval_ref( s, 1, NULL);
-      if (el == ELNULL) return 0;
+      el = eval_ref( s, 1, nullptr);
+      if (el == nullptr) return 0;
 
       *x_result = el->value;
       return 1;
@@ -730,8 +730,8 @@ eval( expr *s, double *x_result, int *i_result)
             if (!q->is( "ref"))
    EVALERROR( "Assignment allowed only to variables and array references.")
 
-            el = eval_ref( q, 0, NULL);
-            if (el == ELNULL) return 0;
+            el = eval_ref( q, 0, nullptr);
+            if (el == nullptr) return 0;
             el->value = x;
          }
       }
@@ -765,7 +765,7 @@ eval( expr *s, double *x_result, int *i_result)
 
    else if (s->is( "Stop"))
    {
-      pc_next = SNULL;
+      pc_next = nullptr;
       return 0;
    }
 
@@ -781,8 +781,8 @@ eval( expr *s, double *x_result, int *i_result)
       EVAL( s->down->next)
       i = 1000 * (int) (x + 0.5);
       pc_next = S.get_next( i-1);
-      if (pc_next != SNULL && pc_next->step_number >= i + 1000)
-         pc_next = SNULL;
+      if (pc_next != nullptr && pc_next->step_number >= i + 1000)
+         pc_next = nullptr;
       return 1;
    }
 
@@ -810,7 +810,7 @@ eval( expr *s, double *x_result, int *i_result)
             step *st;
 
             st = S.get_next(0);
-            while (st != SNULL)
+            while (st != nullptr)
             {
                st->display();
                st = S.next( st);
@@ -840,7 +840,7 @@ eval( expr *s, double *x_result, int *i_result)
             step *st;
 
             st = S.get_next(0);
-            while (st != SNULL)
+            while (st != nullptr)
             {
                st->display();
                st = S.next( st);
@@ -886,7 +886,7 @@ eval( expr *s, double *x_result, int *i_result)
             EVAL( p->down->next)
             part = 1000 * (int) (x + 0.5);
             st = S.get_next( part-1);
-            while (st != SNULL)
+            while (st != nullptr)
             {
                if (st->step_number < part || st->step_number >= part+1000)
                   break;
@@ -899,8 +899,8 @@ eval( expr *s, double *x_result, int *i_result)
             element *el;
 
             v = find_var( p->value.i);
-            el = eval_ref( p, 1, NULL);
-            if (el == ELNULL) continue;
+            el = eval_ref( p, 1, nullptr);
+            if (el == nullptr) continue;
 
             if (v->type == 1)
                printf( "     %c[%d] = %lg\n", v->name, el->i1, el->value);
@@ -915,7 +915,7 @@ eval( expr *s, double *x_result, int *i_result)
             EVAL( p->down->next)
             i = (int) (x * 1000.0 + 0.5);
             st = S.get( i);
-            if (st == SNULL)
+            if (st == nullptr)
                printf( "     Step %-.3f is undefined.\n", (float) x);
             else
                st->display();
@@ -928,7 +928,7 @@ eval( expr *s, double *x_result, int *i_result)
          {
             v = find_var( p->value.i);
             if (v->type == (-1))
-               v->get_value( &x, NULL);
+               v->get_value( &x, nullptr);
 
             if (v->type == 3 && v->num_args == 0)
             {
@@ -995,7 +995,7 @@ eval( expr *s, double *x_result, int *i_result)
          *x_result = x;
          return 1;
       }
-      if (!v->get_value( &x, NULL)) return 0;
+      if (!v->get_value( &x, nullptr)) return 0;
       *x_result = x;
       return 1;
    }
@@ -1049,7 +1049,7 @@ eval( expr *s, double *x_result, int *i_result)
 
    else
    {
-      sprintf( message, "Cannot recognize token: %s.\n", s->symbol);
+      sprintf( message, "Cannot recognize token: %s.\n", s->symbol.c_str());
       EVALERROR( message)
    }
 }
@@ -1058,7 +1058,7 @@ eval( expr *s, double *x_result, int *i_result)
 void
 eval_error( const char *s)
 {
-   if (pc == SNULL)
+   if (pc == nullptr)
       printf( "  Evaluation error: %s\n", s);
    else
    {
@@ -1070,7 +1070,7 @@ eval_error( const char *s)
 
 
 int
-eval_iter( expr *s, expr *t, double *x_result, int *i_result, const char *symbol)
+eval_iter( expr *s, expr *t, double *x_result, int *i_result, const std::string &symbol)
 {
    expr *p, *q;
    double x_start, x_inc, x_end, x_cur;
@@ -1079,7 +1079,7 @@ eval_iter( expr *s, expr *t, double *x_result, int *i_result, const char *symbol
    vars *v;
 
    static const char *symbols[] = {
-      "conj", "disj", "first", "for", "max", "min", "prod", "sum", NULL
+      "conj", "disj", "first", "for", "max", "min", "prod", "sum", nullptr
    };
 
    if (!s->is( "iter"))
@@ -1092,8 +1092,8 @@ eval_iter( expr *s, expr *t, double *x_result, int *i_result, const char *symbol
 
    /* Determine which action is to be done. */
 
-   for (action = 0; symbols[action] != NULL; action++)
-      if (strcmp( symbol, symbols[action]) == 0) break;
+   for (action = 0; symbols[action] != nullptr; action++)
+      if (symbol == symbols[action] ) break;
 
    /*
     *  It is assumed that i_result is initialized for conj() and disj(),
@@ -1200,7 +1200,7 @@ eval_ref( expr *s, int demand_switch, char *prompt)
    if (s->hd())
    {
       printf( " Null array reference.\n");
-      return ELNULL;
+      return nullptr;
    }
 
    if (s->next->hd())
@@ -1210,14 +1210,14 @@ eval_ref( expr *s, int demand_switch, char *prompt)
    else
    {
       printf( "Array reference with more than two indices.\n");
-      return ELNULL;
+      return nullptr;
    }
 
-   if (!eval( s, &x, &i)) return ELNULL;
+   if (!eval( s, &x, &i)) return nullptr;
    i1 = (int) (x + 0.5);   i2 = 0;
    if (num_args == 2)
    {
-      if (!eval( s->next, &x, &i)) return ELNULL;
+      if (!eval( s->next, &x, &i)) return nullptr;
       i2 = (int) (x + 0.5);
    }
 

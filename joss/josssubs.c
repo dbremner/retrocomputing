@@ -16,12 +16,17 @@ extern "C" void exit(int);
  *  EXPR
  */
 
-expr::expr( const char *s)
+expr::expr( std::string s) :
+   symbol{s}
 {
-   strcpy( symbol, s);
+   value.f = 0.0f;
+    
+} 
+ 
+expr::expr( const char *s) :
+   symbol{s}
+{
    value.f = 0.0;
-   pos = 0;
-   next = back = down = ENULL;
 }
 
 
@@ -57,7 +62,7 @@ expr::copy()
       g->pos = f->pos;
       if (g->is( "string") || g->is( "name"))
       {
-         if (f->value.s == (fstring *) NULL)
+         if (f->value.s == nullptr)
             f->value.s = g->value.s;
          else
          {
@@ -72,7 +77,7 @@ expr::copy()
 
       /*  Copy the subtree. */
 
-      if (f->down != ENULL)
+      if (f->down != nullptr)
          g->down = f->down->copy();
 
       e->back->append( g);
@@ -90,15 +95,15 @@ expr::find( const char *s)
    {
       if (p->is( s)) return(p);
    }
-   return ENULL;
+   return nullptr;
 }
 
 
 void
 expr::init_head()
 {
-   strcpy( symbol, "head");
-   down = ENULL;
+   symbol = "head";
+   down = nullptr;
    next = back = this;
 }
 
@@ -106,14 +111,14 @@ expr::init_head()
 int
 expr::hd()
 {
-   return( strcmp( symbol, "head") == 0);
+   return symbol == "head";
 }
 
 
 int
 expr::is( const char *s)
 {
-   if (strcmp( symbol, s) == 0)
+   if (symbol == s)
       return(1);
    else return(0);
 }
@@ -121,8 +126,8 @@ expr::is( const char *s)
 int
 expr::is2( const char *s1, const char *s2)
 {
-   if (strcmp( symbol, s1) == 0
-    && strcmp( next->symbol, s2) == 0)
+   if ((symbol == s1)
+    && (next->symbol == s2))
       return(1);
    else return(0);
 }
@@ -130,9 +135,9 @@ expr::is2( const char *s1, const char *s2)
 int
 expr::is3( const char *s1, const char *s2, const char *s3)
 {
-   if (strcmp( symbol, s1) == 0
-    && strcmp( next->symbol, s2) == 0
-    && strcmp( next->next->symbol, s3) == 0)
+   if (( symbol == s1)
+    && ( next->symbol == s2)
+    && ( next->next->symbol == s3) )
       return(1);
    else return(0);
 }
@@ -312,10 +317,10 @@ step::clear()
 {
    step_number = 0;
    line[0] = '\0';
-   if (e != ENULL)
+   if (e != nullptr)
    {
       delete_exp( e);
-      e = ENULL;
+      e = nullptr;
    }
 }
 
@@ -346,7 +351,7 @@ step::move( step *s)
 
    s->step_number = 0;
    s->line[0] = '\0';
-   s->e = ENULL;
+   s->e = nullptr;
 }
 
 
@@ -354,7 +359,7 @@ void
 step::set( int number, char *t, expr *f)
 {
    step_number = number;
-   if (t == NULL)
+   if (t == nullptr)
       line[0] = '\0';
    else strcpy( line, t);
    e = f;
@@ -367,7 +372,7 @@ steps::init()
    int i;
    for (i=0; i<MAX_NUM_STEPS; i++)
    {
-      st[i].set( 0, NULL, ENULL);
+      st[i].set( 0, nullptr, nullptr);
    }
    num_steps = 0;
 }
@@ -408,7 +413,7 @@ steps::remove( step *s)
    int i, j;
 
    j = s - st;
-   if (j < 0 || j >= num_steps) return SNULL;
+   if (j < 0 || j >= num_steps) return nullptr;
 
    st[j].clear();
 
@@ -418,7 +423,7 @@ steps::remove( step *s)
    num_steps--;
 
    if (j < num_steps) return &st[j];
-   else return SNULL;
+   else return nullptr;
 }
 
 
@@ -442,7 +447,7 @@ steps::get( int step_number)
       if (st[i].step_number > step_number) break;
       return &st[i];
    }
-   return( SNULL);
+   return( nullptr);
 }
 
 
@@ -454,7 +459,7 @@ steps::get_next( int step_number)
    {
       if (st[i].step_number > step_number) return &st[i];
    }
-   return( SNULL);
+   return( nullptr);
 }
 
 
@@ -465,14 +470,14 @@ steps::next( step *s)
 
    i = s - st;
    if (i<0 || i >= num_steps-1)
-      return SNULL;
+      return nullptr;
    return &st[i+1];
 }
 
 
 element::element()
 {
-   next = ELNULL;
+   next = nullptr;
    i1 = i2 = 0;
    value = 0.0;
 }
@@ -489,7 +494,7 @@ vars::vars()
 
    name = 'a';   type = -1;
    value = 0.0;  num_args = 0;
-   f = ENULL;    e_list = ELNULL;
+   f = nullptr;    e_list = nullptr;
 }
 
 
@@ -501,7 +506,7 @@ vars::init( int var_name)
    name = var_name;   type = -1;
    value = 0.0;   num_args = 0;
 
-   f = ENULL;   e_list = ELNULL;
+   f = nullptr;   e_list = nullptr;
 }
 
 
@@ -520,7 +525,7 @@ vars::get_value( double *x_result, char *prompt)
 
    if (type == -1)
    {
-      if (prompt == NULL)
+      if (prompt == nullptr)
       {
          sprintf( line, "     %c = ", name);
          prompt = line;
@@ -574,8 +579,8 @@ vars::find_element( int j1, int j2, int demand_switch, char *prompt)
     */
 
    new_element = 1;
-   for (v = e_list, t = (element *)NULL;
-        v != ELNULL;
+   for (v = e_list, t = nullptr;
+        v != nullptr;
         t = v, v = v->next)
    {
       if (v->i1 < j1) continue;
@@ -589,7 +594,7 @@ vars::find_element( int j1, int j2, int demand_switch, char *prompt)
 
    if ((new_element && demand_switch == 1) || demand_switch == 2)
    {
-      if (prompt == NULL)
+      if (prompt == nullptr)
       {
          if (type == 1)
             sprintf( line, "     %c[%d] = ", name, j1);
@@ -598,7 +603,7 @@ vars::find_element( int j1, int j2, int demand_switch, char *prompt)
          prompt = line;
       }
 
-      if (!demand( prompt, &x)) return ELNULL;
+      if (!demand( prompt, &x)) return nullptr;
    }
 
    if (new_element)
@@ -606,7 +611,7 @@ vars::find_element( int j1, int j2, int demand_switch, char *prompt)
       u = new element();
       u->value = x;   u->next = v;
       u->i1 = j1;     u->i2 = j2;
-      if (t == ELNULL) e_list = u;
+      if (t == nullptr) e_list = u;
       else t->next = u;
       v = u;
    }
@@ -622,17 +627,17 @@ vars::clear()
 {
    element *e1, *e2;
 
-   for (e1 = e_list, e_list = ELNULL;
-        e1 != ELNULL;
+   for (e1 = e_list, e_list = nullptr;
+        e1 != nullptr;
         e1 = e2)
    {
-      e2 = e1->next;   e1->next = ELNULL;
+      e2 = e1->next;   e1->next = nullptr;
       delete e1;
    }
 
-   if (f != ENULL)
+   if (f != nullptr)
    {
-      delete_exp( f);   f = ENULL;
+      delete_exp( f);   f = nullptr;
    }
 
    type = (-1);   value = 0.0;
@@ -655,14 +660,14 @@ vars::display()
          break;
 
       case 1:
-         for (e = e_list; e != ELNULL; e = e->next)
+         for (e = e_list; e != nullptr; e = e->next)
          {
             printf( "     %c[%d] = %lg\n", name, e->i1, e->value);
          }
          break;
 
       case 2:
-         for (e = e_list; e != ELNULL; e = e->next)
+         for (e = e_list; e != nullptr; e = e->next)
          {
             printf( "     %c[%d,%d] = %lg\n", name, e->i1, e->i2,
                     e->value);
@@ -685,30 +690,30 @@ delete_exp( expr *e)
 {
    expr *f;
 
-   if (e == ENULL) return;
+   if (e == nullptr) return;
 
    while (!e->hd()) e = e->back;
 
-   e->back->next = ENULL;
-   e->back = ENULL;
+   e->back->next = nullptr;
+   e->back = nullptr;
 
-   for (f = e; f != ENULL; f = f->next)
+   for (f = e; f != nullptr; f = f->next)
    {
-      if (f->down != ENULL)
+      if (f->down != nullptr)
       {
          delete_exp( f->down);
-         f->down = ENULL;
+         f->down = nullptr;
       }
    }
 
-   while (e != ENULL)
+   while (e != nullptr)
    {
       f = e->next;
-      e->next = e->back = ENULL;
+      e->next = e->back = nullptr;
       if (e->is( "string") || e->is( "name"))
       {
-         if (e->value.s != (fstring *) NULL) delete e->value.s;
-         e->value.s = (fstring *) NULL;
+         if (e->value.s != nullptr) delete e->value.s;
+         e->value.s = nullptr;
       }
       delete e;
       e = f;
@@ -753,9 +758,9 @@ join( expr *e1, expr *e2)
 {
    expr *f1, *f2;
 
-   if (e2 == ENULL) return;
+   if (e2 == nullptr) return;
 
-   if (e1 == ENULL || !e1->hd() || !e2->hd())
+   if (e1 == nullptr || !e1->hd() || !e2->hd())
       printf( "join called, not at a header.\n" );
 
    if (e2->next == e2) return;
@@ -764,7 +769,7 @@ join( expr *e1, expr *e2)
    f1->next = e2->next;   e2->next->back = f1;
    f2->next = e1;   e1->back = f2;
 
-   e2->next = e2->back = e2->down = ENULL;
+   e2->next = e2->back = e2->down = nullptr;
    delete e2;
 }
 
@@ -772,16 +777,16 @@ join( expr *e1, expr *e2)
 void
 join_down( expr *e1, expr *e2)
 {
-   if (e2 == ENULL) return;
+   if (e2 == nullptr) return;
 
-   if (e1 == ENULL || e1->hd())
+   if (e1 == nullptr || e1->hd())
       printf( "join_down called at a null or header expression.\n");
    if (!e2->hd())
       printf( "join_down called, not at a header.\n" );
 
    if (e2->next == e2) return;
 
-   if (e1->down == ENULL) e1->down = e2;
+   if (e1->down == nullptr) e1->down = e2;
    else join( e1->down, e2);
 }
 
@@ -796,7 +801,7 @@ short_display( expr *e, char *s)
    else if (e->is( "call") || e->is( "formula") || e->is( "ref")
          || e->is( "var"))
    {
-      strncpy( s, e->symbol, 3);
+      strncpy( s, e->symbol.c_str(), 3);
       s[3] = ':';   s[4] = e->value.i;   s[5] = '\0';
    }
    else if (e->is( "stack"))
@@ -806,7 +811,7 @@ short_display( expr *e, char *s)
    }
    else
    {
-      strcpy( s, e->symbol);
+      strcpy( s, e->symbol.c_str());
    }
 }
 
@@ -842,7 +847,7 @@ split_at( expr *e)
 {
    expr *p, *q;
 
-   if (e->next->hd()) q = ENULL;
+   if (e->next->hd()) q = nullptr;
    else q = split( e->next);
 
    p = split( e);   delete_exp( p);
@@ -855,7 +860,7 @@ split_down( expr *e)
 {
    expr *f;
 
-   f = e->down;  e->down = ENULL;
+   f = e->down;  e->down = nullptr;
    return f;
 }
 

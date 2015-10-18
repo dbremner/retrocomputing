@@ -1,3 +1,4 @@
+#include <string>
 /*
  *  CLASS DEFINITIONS:
  */
@@ -17,15 +18,16 @@ public:
 
 class expr {
 public:
-   expr *down, *next, *back;
-   char symbol[12];
+   expr *down=nullptr, *next=nullptr, *back=nullptr;
+   std::string symbol;
    union {
       double f;
       int i;
       fstring *s;
    } value;
-   int pos;
+   int pos = 0;
 
+   expr( std::string);
    expr( const char *);
    void append( expr *);
    expr *copy();
@@ -36,8 +38,6 @@ public:
    int is2( const char *, const char *);
    int is3( const char *, const char *, const char *);
 };
-
-#define ENULL ((expr *) NULL)
 
 /*
  *   FORMS
@@ -88,8 +88,6 @@ public:
    void set( int number, char *t, expr *f);
 };
 
-#define SNULL ((step *) NULL)
-
 class steps {
    step st[MAX_NUM_STEPS];
    int num_steps;
@@ -117,7 +115,6 @@ public:
 
    element();
 };
-#define ELNULL ((element *) NULL)
 
 /*
  *   VARS
@@ -153,7 +150,7 @@ int demand( char *prompt, double *x);
 int eval( expr *s, double *x_result, int *i_result);
 void eval_error( const char *s);
 int eval_iter( expr *s, expr *t, double *x_result, int *i_result,
-               const char *symbol);
+               const std::string &symbol);
 element *eval_ref( expr *s, int demand_switch, char *prompt);
 vars *find_var( int name);
 void init_eval();

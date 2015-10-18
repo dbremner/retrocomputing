@@ -28,7 +28,7 @@ main()
 
    while( read_line( ": "))
    {
-      root = ENULL;
+      root = nullptr;
       if (!scan())
       {
          delete_exp( root);
@@ -39,7 +39,7 @@ main()
       {
          printf( "Scanned the line:\n     ");
          for (e = root->next; !e->is("head"); e = e->next)
-            printf( " %s", e->symbol);
+            printf( " %s", e->symbol.c_str());
          printf( "\n");
       }
 
@@ -62,7 +62,7 @@ main()
          (void) eval( root, &x_result, &i_result);
          delete_exp( root);
       }
-      root = ENULL;
+      root = nullptr;
    }
 }
 
