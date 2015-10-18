@@ -28,7 +28,7 @@ void putline(struct line *lp, FILE *fp)
 void getlno(struct lno *lnop, int c)
 {
 	int gn, ln;
-	static char badlno[] = "Bad line or group number";
+	static const char badlno[] = "Bad line or group number";
 
 	if (c < 0)
 		c = getnb();
@@ -114,7 +114,7 @@ alocline(char *cp)
  * does a non local goto back to the command
  * dispatcher.
  */
-void diag(char *s)
+void diag(const char *s)
 {
 	struct line *lp;
 	char *cp;

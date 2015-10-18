@@ -40,6 +40,6 @@ void	putline (struct line *lp, FILE *fp);
 void	getlno (struct lno *lnop, int c);
 int	getnum (int c);
 struct line	*alocline (char *cp);
-void	diag (char *s);
+void	diag (const char *s);
 int	getnb (void);
 double	drand48 (void);
