@@ -7,10 +7,6 @@
  */
 #include "focal.h"
 
-#ifdef	__STDC__
-#define	unlink	remove
-#endif
-
 #ifdef DIR_SUPPORT
 # ifdef	DOS
 #  include <dos.h>
@@ -87,7 +83,7 @@ void library(void)
 #ifdef	vax
 		if (delete(p) < 0)
 #else
-		if (unlink(p) < 0)
+		if (remove(p) < 0)
 #endif
 			diag("Cannot delete");
 		break;
@@ -179,7 +175,7 @@ void library(void)
  */
 void catchcc(void)
 {
-	signal(SIGINT, (void (*) ARG((int)))onintr);
+	signal(SIGINT, (void (*) (int))onintr);
 }
 
 /*

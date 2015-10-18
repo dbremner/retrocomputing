@@ -1,11 +1,3 @@
-#ifdef	__STDC__
-# define ARG(list) list
-#else
-# define ARG(list) ()
-# define void int
-# define EXIT_SUCCESS 0
-#endif
-
 int	main (void);
 void	builtin (char *cp, double (*fp)(double));
 void	process (void);
