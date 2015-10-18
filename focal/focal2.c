@@ -36,15 +36,15 @@ struct direct	db;
  * detailed knowledge of the file system of
  * the operating system.
  */
-void library()
+void library(void)
 {
-	register char	*p;
-	register int	c;
-	register int	d;
-	register char	*sctp;
-	register struct line	*lp1;
-	register struct line	*lp2;
-	register FILE	*fp;
+	char	*p;
+	int	c;
+	int	d;
+	char	*sctp;
+	struct line	*lp1;
+	struct line	*lp2;
+	FILE	*fp;
 
 	c = getnb();
 	if (c!='c' && c!='s' && c!='l' && c!='d')
@@ -124,8 +124,8 @@ void library()
 		}
 #else
 #ifdef DIRENT
-		register struct dirent *de;
-		register DIR *dp;
+		struct dirent *de;
+		DIR *dp;
 
 		if (d == 0)
 			p = ".";
@@ -142,7 +142,7 @@ void library()
 		}
 		closedir(dp);
 #else
-		register int	fd = 0;
+		int	fd = 0;
 		
 		if (d == 0)
 			p = ".";
@@ -177,7 +177,7 @@ void library()
  * Set up to catch the user's
  * ^C interrupt.
  */
-void catchcc()
+void catchcc(void)
 {
 	signal(SIGINT, (void (*) ARG((int)))onintr);
 }
@@ -188,7 +188,7 @@ void catchcc()
  * is set a flag, which is looked at
  * by the dispatcher.
  */
-void onintr()
+void onintr(void)
 {
 	++intflag;
 }

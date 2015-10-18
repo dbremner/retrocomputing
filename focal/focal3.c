@@ -12,9 +12,7 @@
  * Used any time a source line is
  * printed.
  */
-void putline(lp, fp)
-register struct line *lp;
-FILE *fp;
+void putline(struct line *lp, FILE *fp)
 {
 	fprintf(fp, "%02d.%02d %s\n", lp->l_gno, lp->l_lno, lp->l_text);
 }
@@ -27,11 +25,9 @@ FILE *fp;
  * shape, is packed into the structure
  * pointed to by `lnop'.
  */
-void getlno(lnop, c)
-register struct lno *lnop;
-register c;
+void getlno(struct lno *lnop, int c)
 {
-	register gn, ln;
+	int gn, ln;
 	static char badlno[] = "Bad line or group number";
 
 	if (c < 0)
@@ -77,10 +73,9 @@ register c;
  * number, and is assumed to be valid.
  * Return the number read.
  */
-int getnum(c)
-register c;
+int getnum(int c)
 {
-	register n;
+	int n;
 
 	n = 0;
 	while (isdigit(c)) {
@@ -100,10 +95,9 @@ register c;
  * Return a pointer to the line.
  */
 struct line *
-alocline(cp)
-register char *cp;
+alocline(char *cp)
 {
-	register struct line *lp = NULL;
+	struct line *lp = NULL;
 
 	lp = (struct line *) malloc(sizeof(*lp)+strlen(cp)+1);
 	if (lp == NULL)
@@ -120,11 +114,10 @@ register char *cp;
  * does a non local goto back to the command
  * dispatcher.
  */
-void diag(s)
-char *s;
+void diag(char *s)
 {
-	register struct line *lp;
-	register char *cp;
+	struct line *lp;
+	char *cp;
 
 	printf("%s!\n", s);
 	if ((lp=clp) != NULL) {
@@ -150,9 +143,9 @@ char *s;
  * character from the current source line.
  * Return it.
  */
-int getnb()
+int getnb(void)
 {
-	register c;
+	int c;
 
 	while ((c = *ctp++)==' ' || c=='\t')
 		;
@@ -164,7 +157,7 @@ int getnb()
  * return pseudo-random number in interval [0.0, 1.0)
  *
  */
-double drand48()
+double drand48(void)
 {
 	return (double) (rand() / 32768.0);
 }

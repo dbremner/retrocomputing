@@ -68,7 +68,7 @@ struct	sym	*sym[N_HASH + 1];	/* Symbol table */
 
 int main()
 {
-	register int	c;
+	int	c;
 
 #ifdef FUNCTIONS
 	builtin("fsin", fsin);
@@ -112,11 +112,9 @@ int main()
  * the functions into the table, and
  * never used again!
  */
-void builtin(cp, fp)
-char	*cp;
-double	(*fp)();
+void builtin(char *cp, double (*fp)(double))
 {
-	register struct sym *sp = NULL;
+	struct sym *sp = NULL;
 	int	ix;
 	
 	sp = (struct sym *)malloc(sizeof(*sp)+strlen(cp)+1);
@@ -137,9 +135,9 @@ double	(*fp)();
 
 
 #ifdef	DEBUG
-void dumpsyms()
+void dumpsyms(void)
 {
-	register struct sym *sp;
+	struct sym *sp;
 	int	i;
 	
 	for (i = 0; i < N_HASH; ++i) {
@@ -162,13 +160,13 @@ void dumpsyms()
  * and calls the required subfunctions to get
  * the focal commands executed.
  */
-void process()
+void process(void)
 {
 	double		limit, step = 1.0;
 	double		value;
-	register int	c;
-	register struct sym *sp;
-	register struct line *lp;
+	int	c;
+	struct sym *sp;
+	struct line *lp;
 	struct lno	lno;
 	struct line	*lp1, *lp2, *lp3;
 	int		grp = 0;
@@ -409,10 +407,10 @@ loop:
  * The input expression must be a legal floating
  * point number, although no checking is done.
  */
-void ask()
+void ask(void)
 {
-	register struct	sym	*sp;
-	register int	c;
+	struct	sym	*sp;
+	int	c;
 
 	while ((c=getnb())!=0 && c!=';') {
 		if (c == '"') {
@@ -440,7 +438,7 @@ void ask()
  * Complain about bad line
  * numbers. Used all over the place.
  */
-void badline()
+void badline(void)
 {
 	diag("Bad line number");
 }
@@ -460,7 +458,7 @@ static struct control *ccb_free = NULL;
  *  -- added by Akira Kida
  */
 struct control *
-newcontrol()
+newcontrol(void)
 {
 	struct control *cp;
 	
@@ -479,8 +477,7 @@ newcontrol()
  * Just return one to the free list.
  */
 void
-freecontrol(cp)
-struct control *cp;
+freecontrol(struct control *cp)
 {
 	cp->c_fp = ccb_free;
 	ccb_free = cp;
@@ -496,9 +493,9 @@ struct control *cp;
  * that the loop variables are saved.
  *  -- added by Akira Kida
  */
-void pushcntl()
+void pushcntl(void)
 {
-	register struct control *cp;
+	struct control *cp;
 
 	cp = newcontrol();
 	cp->c_fp = control;
@@ -518,9 +515,9 @@ void pushcntl()
 /*
  * Pop an entry from the control stack
  */
-void popcntl()
+void popcntl(void)
 {
-	register struct control *cp;
+	struct control *cp;
 
 	cp = control;
 	control = cp->c_fp;
@@ -541,7 +538,7 @@ void popcntl()
  * the control stack, restoring all of the
  * global variables.
  */
-void popdo()
+void popdo(void)
 {
 	if (control == NULL)
 		diag("Return not in do");
@@ -554,7 +551,7 @@ void popdo()
  * control stack, restoring all the global
  * variables.
  */
-void popfor()
+void popfor(void)
 {
 	if (control == NULL)
 		diag("For stack botch");
@@ -572,11 +569,10 @@ void popfor()
  * if you "go" out of a loop and then "for"
  * on the same variable.
  */
-void clearfors(sp)
-register struct	sym	*sp;
+void clearfors(struct sym *sp)
 {
-	register struct	control	*cp1;
-	register struct	control	*cp2;
+	struct	control	*cp1;
+	struct	control	*cp2;
 
 	if (mode==C_FOR && forsp==sp)
 		popfor();
@@ -605,12 +601,11 @@ register struct	sym	*sp;
  * is the first character of the line
  * number, which is assumed to be valid.
  */
-void inject(c)
-register int	c;
+void inject(int c)
 {
-	register struct	line	*lp1;
-	register struct line	*lp2;
-	register struct	line	*lp3;
+	struct line	*lp1;
+	struct line	*lp2;
+	struct line	*lp3;
 	struct lno	lno;
 
 	getlno(&lno, c);
@@ -649,11 +644,9 @@ register int	c;
 }
 
 
-int getline(cp, fp)
-register char *cp;
-register FILE *fp;
+int getline(char *cp, FILE *fp)
 {
-	register c;
+	int c;
 
 	while ((c=getc(fp))!=EOF && c!='\n')
 		*cp++ = c;
@@ -664,10 +657,10 @@ register FILE *fp;
 }
 
 
-void type()
+void type(void)
 {
-	register char *fmt;
-	register c;
+	char *fmt;
+	int c;
 static	char fmtb[20];
 static	int ifmtb = 1;
 	int x, y;
@@ -718,13 +711,11 @@ static	int ifmtb = 1;
 	--ctp;
 }
 
-void save(lnop, fp)
-register struct lno *lnop;
-FILE *fp;
+void save(struct lno *lnop, FILE *fp)
 {
 	struct lno lno;
-	register struct line *lp;
-	register tgroup, lgroup;
+	struct line *lp;
+	int tgroup, lgroup;
 
 	if (lnop == NULL) {
 		lno.ln_type = LN_ALL;
@@ -760,7 +751,7 @@ FILE *fp;
 
 void erasesyms()
 {
-	register struct sym *sp1, *sp2;
+	struct sym *sp1, *sp2;
 	int	i;
 	
 	for (i = 0; i < N_HASH; ++i) {

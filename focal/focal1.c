@@ -8,11 +8,11 @@
  * Evaluate an expression.
  */
 double
-eval()
+eval(void)
 {
 	double		val;
 	double		rop;
-	register int	c;
+	int	c;
 
 	if ((c=getnb())=='+' || c=='-') {
 		val = primary();
@@ -34,11 +34,11 @@ eval()
 }
 
 double
-primary()
+primary(void)
 {
 	double		val;
 	double		rop;
-	register int	c;
+	int	c;
 
 	val = term();
 	while ((c = getnb())=='*' || c=='/' || c=='^') {
@@ -55,17 +55,17 @@ primary()
 }
 
 double
-term()
+term(void)
 {
-	register int	c;
-	register char	*cp;
+	int	c;
+	char	*cp;
 	double		val;
-	register int	fsign;
-	register int	fdot;
-	register int	fexp;
-	register int	type;
-	register int	subs = 0;
-	register struct	sym	*sp;
+	int	fsign;
+	int	fdot;
+	int	fexp;
+	int	type;
+	int	subs = 0;
+	struct	sym	*sp;
 	char		id[NID];
 	char		nbuf[20];
 
@@ -144,12 +144,9 @@ term()
 
 
 struct	sym *
-lookup(id, type, subs)
-char *id;
-register type;
-int	subs;
+lookup(char *id, int type, int subs)
 {
-	register struct sym *sp;
+	struct sym *sp;
 	int	ix;
 	
 	ix = hashsym(id, type, subs);
@@ -165,12 +162,12 @@ int	subs;
 }
 
 struct sym *
-getsym()
+getsym(void)
 {
-	register c;
+	int c;
 	char id[NID];
-	register char *cp;
-	register struct sym *sp;
+	char *cp;
+	struct sym *sp;
 	int subs = 0, type;
 	int	ix;
 	
