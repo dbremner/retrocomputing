@@ -644,7 +644,7 @@ void inject(int c)
 }
 
 
-int getline(char *cp, FILE *fp)
+int focal_getline(char *cp, FILE *fp)
 {
 	int c;
 

@@ -71,7 +71,7 @@ void library(void)
 		}
 		line = NULL;
 		sctp = ctp;
-		while (getline(abuf, fp) != 0) {
+		while (focal_getline(abuf, fp) != 0) {
 			ctp = abuf;
 			if ((c=getnb()) != 0) {
 				if (isdigit(c) == 0)

@@ -17,7 +17,7 @@ void	popdo (void);
 void	popfor (void);
 void	clearfors (struct sym *sp);
 void	inject (int c);
-int	getline (char *cp, FILE *fp);
+int	focal_getline (char *cp, FILE *fp);
 void	type (void);
 void	save (struct lno *lnop, FILE *fp);
 void	erasesyms (void);
