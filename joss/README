@@ -1,0 +1,58 @@
+From rfm@whscad1.wh.lucent.com  Mon Oct  7 12:42:25 1996
+Return-Path: rfm@whscad1.wh.lucent.com
+Received: from locke.ccil.org (localhost [127.0.0.1]) by snark.thyrsus.com (8.7.4/8.7.3) with SMTP id MAA32183 for <esr>; Mon, 7 Oct 1996 12:42:24 -0400
+Received: from cbgw3.lucent.com (cbgw3.att.com [192.20.239.137]) by locke.ccil.org (8.6.9/8.6.10) with SMTP id MAA07243 for <esr@snark.thyrsus.com>; Mon, 7 Oct 1996 12:36:15 -0400
+Received: from emsr1.emsr.lucent.com by cbig3.firewall.lucent.com (SMI-8.6/EMS-L sol2)
+	id MAA10915; Mon, 7 Oct 1996 12:29:02 -0400
+Received: by emsr1.emsr.lucent.com (SMI-8.6/EMS-1.2 Solaris/emsr)
+	id MAA15851 for snark.thyrsus.com!esr; Mon, 7 Oct 1996 12:23:08 -0400
+Message-Id: <199610071623.MAA15851@emsr1.emsr.lucent.com>
+From: rfm@whscad1.wh.lucent.com (Robert A Mayans +1 +1 201 386 2247)
+Date: 7 Oct 96 12:23:00 -0400
+Original-From: whscad1!rfm (Robert A Mayans +1 +1 201 386 2247)
+To: esr@snark.thyrsus.com
+Subject: Re: JOSS language
+Content-Type: text
+X-UIDL: e65d09d4d2419adcb4d6c6fe96a35058
+Status: RO
+Content-Length: 1106
+Lines: 37
+
+   Greetings, Eric.
+
+   My office partner will send the JOSS implementation from his home
+   machine.  (He is Kevin Brown, says he met you a while ago at a party.)
+
+   I looked over the source listing for the first time in a while.
+   I'm afraid I have no documentation.
+
+   A few minor alterations to the language:
+
+   (a)  I replaced the standard JOSS error message of "Eh?" with
+        more specific error messages.
+
+   (b)  The JOSS forms (____.__ for fixed point, ....... for exponential)
+        were replaced by C-format strings like "answer = %d".
+
+   (c)  The JOSS looping construct:
+
+           Do ... for i = 3(1)7
+
+        is harder to parse when you have functions; for example
+
+           for i = a(b)(c)
+           for i = a(b)(c)(d)
+
+        are both legal but very different meanings.  So I used angle
+        brackets:  for i = 3<1>7 
+
+        A less lazy person might alter the parser to read the () instead.
+
+   I don't have a lot of time to work on this, but is there anything I/we
+   can do to prepare it for the hallowed halls of the Retro Museum?
+
+   -- Thanks,
+      Bob Mayans
+
+
+
