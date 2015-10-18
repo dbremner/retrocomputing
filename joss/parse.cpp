@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "joss.h"
+#include "joss.hpp"
 
 extern char *input_line;
 extern char *cur_line;

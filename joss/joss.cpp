@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "joss.h"
+#include "joss.hpp"
 
 char input_line[LINE_LEN];
 char *cur_line;

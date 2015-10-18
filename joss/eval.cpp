@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "joss.h"
+#include "joss.hpp"
 
 double cos( double x);
 double exp( double x);

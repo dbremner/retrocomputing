@@ -6,17 +6,17 @@ CFLAGS = -Wall -Wextra -std=c++14
 joss : joss.o parse.o eval.o josssubs.o Makefile
 	$(CC) $(CFLAGS) -o joss joss.o parse.o eval.o josssubs.o -lm
 
-joss.o : joss.c joss.h Makefile
-	$(CC) $(CFLAGS) -c joss.c -o joss.o
+joss.o : joss.cpp joss.hpp Makefile
+	$(CC) $(CFLAGS) -c joss.cpp -o joss.o
 
-parse.o : parse.c joss.h Makefile
-	$(CC) $(CFLAGS) -c parse.c -o parse.o
+parse.o : parse.cpp joss.hpp Makefile
+	$(CC) $(CFLAGS) -c parse.cpp -o parse.o
 
-eval.o : eval.c joss.h Makefile
-	$(CC) $(CFLAGS) -c eval.c -o eval.o
+eval.o : eval.cpp joss.hpp Makefile
+	$(CC) $(CFLAGS) -c eval.cpp -o eval.o
 
-josssubs.o : josssubs.c joss.h Makefile
-	$(CC) $(CFLAGS) -c josssubs.c -o josssubs.o
+josssubs.o : josssubs.cpp joss.hpp Makefile
+	$(CC) $(CFLAGS) -c josssubs.cpp -o josssubs.o
 
 clean:
 	rm -f joss *.o *~
