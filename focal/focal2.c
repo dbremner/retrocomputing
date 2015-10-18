@@ -138,7 +138,7 @@ void library(void)
 			    ||  strcmp(de->d_name, ".") == 0
 			    ||  strcmp(de->d_name, "..") == 0)
 				continue;
-			printf("%.*s\n", de->d_name);
+			printf("%s\n", de->d_name);
 		}
 		closedir(dp);
 #else
