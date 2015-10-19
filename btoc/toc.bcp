@@ -1,0 +1,1269 @@
+$<UNIX
+GET "LIBHDR"
+$>UNIX
+$<UNIX'
+GET "BCPL_DIR:LIBHDR"
+$>UNIX'
+
+GET "btochdr.bcp"
+GET "synhdr.bcp"
+
+GLOBAL
+$(
+   trnline        : ug + 200  // BCPL input line
+   atline         : ug + 201  // TRUE if we are at a newline in output
+   lastline       : ug + 202  // the last input line we generated output for
+   blib.wrch      : ug + 203  // system wrch
+   indent         : ug + 204  // block indentation
+   outline        : ug + 205  // C output line
+   breakable      : ug + 206  // TRUE if a line break is possible
+   curpos         : ug + 207  // current position in output line
+   inswitch       : ug + 208  // TRUE if we are processing a switchon block
+   curloop        : ug + 209  // set to number of current loop
+   looplabel      : ug + 210  // last loop number set
+   breaklabel     : ug + 211  // TRUE if a break label is needed at end of
+                              // current loop
+   indefine       : ug + 212  // inside a #define ?
+$)
+
+MANIFEST
+$(
+   bitsmask       = #XF0000000
+   manbit         = #X80000000   // set if name is that of a manifest
+   vecbit         = #X40000000   // set if variable has appeared as vector in !
+   bytebit        = #X20000000   // set if variable has appeared as vector in %
+   structbit      = #X10000000   // set if variable has appeared in OF
+$)
+
+LET Btoc( tree ) BE
+$(
+   blib.wrch := wrch
+   wrch := my.wrch
+   trnline, lastline := 1, 1
+   atline := TRUE
+   outline := 0
+   indent := 0
+   breakable := FALSE
+   curpos := 0
+   err.p := level()
+   err.l := error.lab
+   inswitch := FALSE
+   curloop := 0
+   looplabel := 0
+   breaklabel := FALSE
+   indefine   := FALSE
+
+   IF tree!h1 = s.section DO
+   $(
+      LET datv = VEC 20
+//    trnline := tree!h4
+      writef("/** %S : Automatically translated from BCPL to C",tree!h2+1)
+//      datstring(datv)
+//      writes(datv)
+      writes(" **/")
+      newline()
+      tree := tree ! h3
+   $)
+
+   WHILE tree!h1 = s.needs DO tree := tree!h3
+
+   TrnBlockBody( tree )
+
+   wrch := blib.wrch
+   newline()
+   Writef("/** %N lines of C generated from %N lines of BCPL **/*N",outline,
+           trnline )
+   WHILE comments \= 0
+   DO
+   $(
+      Writef("/**%S**/*N", comments + 3)
+      comments := !comments
+   $)
+   RETURN
+
+error.lab:
+   rc := 20
+   wrch := blib.wrch
+$)
+
+AND my.wrch(c) BE
+$(
+   IF nohdrs /\ (trnline > 100000) THEN RETURN
+   
+   WHILE [c = '*N'] &
+         [comments \= 0] &
+         [comments!1 < trnline ]
+   $(
+      LET comm = comments
+      comments := !comments
+
+      wrch := blib.wrch
+      
+      TEST comm!2 = 0
+      THEN
+      $(
+         IF comm!1 \= lastline
+	 THEN $(
+	    wrch('*N'); outline := outline + 1
+	    FOR  i = 1 TO indent*4 DO blib.wrch(' ')
+	 $)
+	 writef("/**%S**/", comm+3)
+	 outline := outline + 1
+      $)
+      ELSE
+      $( // It's really a GET
+         IF comm!1 \= lastline
+	 THEN $(
+	    wrch('*N'); outline := outline + 1
+	 $)
+         writef("#include *"%S*"",comm+3)
+      $)
+      wrch := my.wrch
+   $)
+   atline := FALSE
+   IF curpos > 70 & breakable DO
+   $(
+      IF indefine
+      THEN
+         blib.wrch('\')
+         
+      blib.wrch('*N'); outline := outline + 1
+      FOR  i = 1 TO (indent+1)*4 DO blib.wrch(' ')
+      curpos := (indent+1)*4
+   $)
+   breakable := FALSE
+   curpos := curpos + 1
+   blib.wrch(c)
+   TEST c = '*N'
+   THEN $(
+      outline := outline + 1
+      curpos := indent*4
+      FOR  i = 1 TO indent*4 DO blib.wrch(' ')
+      atline := TRUE
+      lastline := lastline + 1
+   $)
+   ELSE lastline := trnline
+//   IF testflags(1) DO tidyup(20)
+$)
+
+AND NewTrn( n ) BE
+$(
+   trnline := n
+$)
+
+AND TrnBlockBody( tree ) BE
+$(1
+   UNTIL tree = 0 DO
+   $(2
+      LET op = tree!h1
+      SWITCHON op INTO
+      $(3
+         DEFAULT: Trans( tree ); RETURN
+
+         CASE s.let:
+            newtrn ( tree!h4 )
+            TrnLetChain( tree!h2 )
+            ENDCASE
+
+         CASE s.manifest:
+         $(
+            LET y = tree!h2
+            LET prevline = tree ! h4
+            
+            newtrn ( tree!h4 )
+            
+            UNTIL y = 0 DO
+            $(  
+               LET name = (y!h2)+h3
+               
+               newtrn ( y ! h4 )
+               (y!h2)!h2 := manbit | typeof ( y!h3 )
+               TEST h1!(y!h3) = s.slct
+               THEN
+               $(
+                  Writef("/** structure : %S = SLCT ",
+                               name)
+                 trnExpression (h2!(y!h3), FALSE, FALSE)
+                 Writes(":")
+                 trnExpression (h3!(y!h3), FALSE, FALSE)
+                 Writes(":")
+                 trnExpression (h4!(y!h3), FALSE, FALSE)
+                 Writes(" **/*N")
+               $)
+               ELSE
+               $(
+                  indefine := TRUE
+                  writef("*N#define %S (",name)
+                  TrnExpression(y!h3, FALSE, FALSE)
+                  writes(")")
+                  indefine := FALSE
+               $)
+               y := y!h1
+            $)
+            newtrn( trnline+1 )
+            newline()
+            ENDCASE
+         $)
+
+         CASE s.global:
+         $(
+            LET y = tree!h2
+
+            newtrn ( tree!h4 )
+            UNTIL y = 0 DO
+            $(
+               LET name = (y!h2)+h3
+               newtrn ( y ! h4 )
+               (y!h2)!h2 := s.global
+               writef("*N%S%S %S;",(externals->"extern ",""),wdtype,name)
+               y := y!h1
+            $)
+            newtrn(trnline+1)
+            newline()
+            ENDCASE
+         $)
+
+         CASE s.static:
+         $(
+            LET y = tree!h2
+            newtrn( tree!h4 )
+            (y!h2)!h2 := typeof(y!h3)
+            UNTIL y = 0 DO
+            $(
+               LET name = (y!h2)+h3
+               newtrn ( y ! h4 )
+               writef("*Nstatic %S %S = ",wdtype,name)
+               TrnExpression( y ! h3 , TRUE, FALSE )
+               writes(";")
+               y := y!h1
+            $)
+            newtrn( trnline + 1 )
+            newline()
+            ENDCASE
+         $)
+      $)3
+      tree := tree ! h3
+   $)2
+$)1
+
+AND Trans( x ) BE UNTIL x = 0 DO
+$(
+   LET op = x ! h1
+   LET h2x, h3x = x!h2, x!h3
+
+   SWITCHON op INTO
+   $(
+      DEFAULT: RETURN
+
+      CASE s.let: CASE s.static:
+      CASE s.manifest: CASE s.global:
+         TrnStat( x , TRUE )
+         RETURN
+
+      CASE s.ass:
+         TrnAssignment( h2x, h3x, x!h4, x!h4 )
+         RETURN
+
+      CASE s.rtap:
+         newtrn( x!h4 )
+         writef("*N%S ( ",h2x+h3)
+         TrnExprList( h3x )
+         writef(" );")
+         RETURN
+
+      CASE s.goto:
+         newtrn ( h3x )
+         writef("*Ngoto %S;",h2x+h3)
+         RETURN
+
+      CASE s.colon:
+         indent := indent - 1
+         writef("*N%S:",h2x+h3)
+         indent := indent + 1
+         trans( h3x )
+         RETURN
+
+      CASE s.if: CASE s.unless:
+      CASE s.test:
+         newtrn( op = s.test -> x!h5, x!h4 )
+         writes("*Nif ( ")
+         IF op = s.unless DO writes("! ")
+         TrnExpression(h2x, op \= s.unless, TRUE)
+         writes(" )")
+         TrnStat( h3x , (op=s.test) & [(h3x!h1=s.if)|(h3x!h1=s.unless)])
+         IF op = s.test DO
+         $(
+            writes("*Nelse")
+            TrnStat(x!h4, FALSE )
+         $)
+         RETURN
+
+      CASE s.loop:
+         writes("*Ncontinue;")
+         RETURN
+
+      CASE s.break:
+         IF inswitch DO
+         $(
+            warning("BREAK found in SWITCHON - please check")
+            breaklabel := TRUE
+            writef("*Ngoto breaklabel%N;",curloop)
+            RETURN
+         $)
+
+      CASE s.endcase:
+         writes("*Nbreak;")
+         RETURN
+
+      CASE s.return:
+         writes("*Nreturn;")
+         RETURN
+
+      CASE s.finish:
+         writes("*Nexit ( 0 );")
+         RETURN
+
+      CASE s.resultis:
+         newtrn( h3x )
+         writes("*Nreturn ")
+         TrnExpression( h2x, TRUE, FALSE )
+         wrch(';')
+         RETURN
+
+      CASE s.while: CASE s.until:
+      $(
+         LET old.inswitch = inswitch
+         LET old.loop = curloop
+         LET old.breaklabel = breaklabel
+         breaklabel := FALSE
+         curloop := newloop()
+         newtrn( x!h4 )
+         writes("*Nwhile ( ")
+         IF op = s.until DO writes("! ")
+         TrnExpression( h2x, op \= s.until , TRUE )
+         writes(" )")
+         inswitch := FALSE
+         TrnStat( h3x , FALSE)
+         inswitch := old.inswitch
+         dobreaklabel()
+         curloop := old.loop
+         breaklabel := old.breaklabel
+         RETURN
+      $)
+
+      CASE s.repeatwhile:
+      CASE s.repeatuntil:
+      CASE s.repeat:
+      $(
+         LET old.inswitch = inswitch
+         LET old.loop = curloop
+         LET old.breaklabel = breaklabel
+         breaklabel := FALSE
+         curloop := newloop()
+         writes("*Ndo")
+         inswitch := FALSE
+         TrnStat( h2x , FALSE)
+         inswitch := old.inswitch
+         newtrn( [op = s.repeat] -> x!h3, x!h4 )
+         writes(" while ( ")
+         IF op = s.repeatuntil DO writes("! ")
+         TEST op = s.repeat
+         THEN writes("true")
+         ELSE TrnExpression( h3x, op \= s.repeatuntil, TRUE )
+         writes(" );")
+         dobreaklabel()
+         curloop := old.loop
+         breaklabel := old.breaklabel
+         RETURN
+      $)
+
+      CASE s.switchon:
+         newtrn( x!h4 )
+         TrnSwitch( x )
+         RETURN
+
+      CASE s.case:
+         newtrn( x!h4 )
+         indent := indent - 1
+         writes("*Ncase ")
+         indent := indent + 1
+         TrnExpression( h2x , TRUE, FALSE )
+         wrch(':')
+         x := h3x
+         LOOP
+
+      CASE s.default:
+         indent := indent - 1
+         writes("*Ndefault:")
+         indent := indent + 1
+         x := h2x
+         LOOP
+
+      CASE s.for:
+         TrnFor( x )
+         RETURN
+
+      CASE s.seq:
+         $( LET type = h2x ! h1
+            TEST type = s.let | type = s.global |
+                 type = s.manifest | type = s.static
+            THEN TrnStat(h2x, TRUE)
+            ELSE trans( h2x )
+            x := h3x
+            LOOP
+         $)
+   $)
+$)
+
+AND TrnStat( x , braces ) BE
+$(
+   SWITCHON x!h1 INTO
+   $(
+      DEFAULT: ENDCASE
+      CASE s.seq: CASE s.let: CASE s.global:
+      CASE s.manifest: CASE s.static:
+               braces := TRUE
+               ENDCASE
+      CASE s.ass:
+               braces := [x!h2!h1 = s.comma] | [x!h2!h1 = s.commawithline]
+               ENDCASE
+   $)
+
+   TEST ScanFor( x )
+   THEN braces := TRUE
+   ELSE IF braces DO writes("*N{")
+
+   indent := indent + 1
+   TrnBlockBody( x )
+   indent := indent - 1
+   IF braces DO writes("*N}")
+$)
+
+AND TrnLetChain( x ) BE
+$(
+   SWITCHON x ! h1 INTO
+   $(
+      CASE s.and:
+         TrnLetChain( x!h2 )
+         newtrn( x ! h4 )
+         x := x ! h3
+         LOOP
+      CASE s.fndef:
+      CASE s.rtdef:
+         TrnProc( x )
+         RETURN
+      DEFAULT:
+         TrnLet( x )
+         RETURN
+   $)
+$) REPEAT
+
+AND TrnLet( x ) BE
+$(
+   LET name = (x!h2)+h3
+   LET left, right = x!h2, x!h3
+   SWITCHON x ! h1 INTO
+   $(
+      CASE s.valdef:
+      $(
+         TEST left!h1 = s.comma | left!h1 = s.commawithline
+         THEN $(
+            UNLESS right!h1 = s.comma | right!h1 = s.commawithline
+            DO TrnError("Left and right Mismatch in declaration")
+            IF left!h1 = s.commawithline DO newtrn( left!h4)
+            IF right!h1 = s.commawithline DO newtrn(right!h4)
+            TrnInit( left!h2, right!h2 )
+            left := left ! h3
+            right := right ! h3
+            LOOP
+         $)
+         ELSE $(
+            TrnInit( left, right )
+            newtrn( x!h4 )
+            ENDCASE
+         $)
+      $) REPEAT
+      CASE s.vecdef:
+         writef("*N%S %S [ ",wdtype,name)
+         TrnExpression( x ! h3 , TRUE, FALSE)
+         writes(" ];")
+         ENDCASE
+   $)
+$)
+
+AND TrnInit( left, right ) BE
+$(
+   LET type = TypeOf( right )
+   left ! h2 := type
+   SWITCHON type INTO
+   $(
+      DEFAULT:
+         writef("*N%S %S",wdtype,left+h3)
+         ENDCASE
+
+      CASE s.table:
+         writef("*Nstatic %S %S[]",wdtype,left+h3)
+         ENDCASE
+
+      CASE s.string:
+         writef("*N%S %S",stringtype,left+h3)
+         ENDCASE
+
+      CASE s.char:   // we actually store chars in ints (!!)
+         writef("*N%S %S",wdtype,left+h3)
+         ENDCASE
+
+      CASE s.float:
+         writef("*Nfloat %S",left+h3)
+         ENDCASE
+   $)
+   UNLESS right!h1 = s.query DO
+   $(
+      writes(" = ")
+      TrnExpression( right, TRUE, FALSE )
+   $)
+   wrch(';')
+$)
+
+AND TrnProc(x) BE
+$(
+   LET name = (x!h2)+h3
+   LET h3x = x!h3
+   LET body = x!h4
+   looplabel := 0  // reset the loop break label counter
+   newline()
+      
+   TEST h2!(x!h2) = s.global
+   THEN
+      Writes("export ")
+   ELSE
+      Writes("local ")
+         
+   writef("%S ",wdtype)
+   writef("%S ( ",name)
+   TEST h3x = 0
+   THEN writes(")")
+   ELSE $(
+      TrnNameList(x!h3)
+      writef(" )*N%S ",wdtype)
+      TrnNameList(x!h3)
+      writes(";")
+   $)
+   IF x!h1 = s.fndef DO
+      TEST body ! h1 = s.valof
+      THEN body := body ! h2
+      ELSE $(
+         writes("*N{*N    return ")
+         TrnExpression( x ! h4, TRUE, FALSE )
+         writes(";*N}*N")
+         RETURN
+      $)
+   TrnStat( body , TRUE)
+   newtrn( trnline + 1) 
+   newline()
+$)
+
+AND TrnNameList( x ) BE UNLESS x = 0 DO
+$(
+   LET op = x!h1
+
+   IF op = s.name DO
+   $(
+      writes(x+h3)
+      x ! h2 := s.number
+      RETURN
+   $)
+   IF op = s.comma | op = s.commawithline DO
+   $(
+      IF op = s.commawithline DO newtrn(h4!x)
+      writef("%S, ",(x!h2)+h3)
+      (x!h2)!h2 := s.number
+      x := x ! h3
+      LOOP
+   $)
+   TrnError("Invalid name list")
+$) REPEAT
+
+AND TrnSwitch( x ) BE
+$(
+   writes("*Nswitch ( ")
+   TrnExpression( x!h2, TRUE, FALSE )
+   writes(" )")
+   inswitch := TRUE
+   TrnStat( x ! h3 , FALSE)
+   inswitch := FALSE
+$)
+
+AND TrnFor( x ) BE
+$(
+   LET var = x!h2
+   LET init = x!h3
+   LET limit = x!h4
+   LET stepexp = x!h5
+   LET cmd = x!h6
+   LET step = [stepexp = 0] -> 1, evalstep( stepexp )
+   LET old.inswitch = inswitch
+   LET old.loop = curloop
+   LET old.breaklabel = breaklabel
+
+   curloop := newloop()
+   breaklabel := FALSE
+
+   newtrn(x!6)
+
+   writef("*Nfor ( %S = ",var+h3)
+   TrnExpression( init , TRUE, FALSE )
+   writef(" ; %S %S ",var+h3, operator(step<0->s.ge,s.le))
+   TrnExpression( limit, FALSE, FALSE )
+   writef(" ; %S",var+h3)
+   TEST ABS step = 1
+   THEN writes(step<0->"--","++")
+   ELSE $(
+//      writef(" = %S%S",var+h3,step<0->""," + "))
+//      TrnExpression( stepexp, FALSE, FALSE )
+      TEST stepexp!h1 = s.neg
+      THEN $(
+         writes(" -= ")
+         TrnExpression( stepexp!h2, FALSE, FALSE )
+      $)
+      ELSE $(
+         writes(" += ")
+         TrnExpression( stepexp, FALSE, FALSE )
+      $)
+   $)
+   writes(" )")
+   inswitch := FALSE
+   TrnStat( cmd , FALSE)
+   dobreaklabel()
+   inswitch := old.inswitch
+   curloop := old.loop
+   breaklabel := old.breaklabel
+$)
+
+AND ScanFor ( x ) = VALOF
+$(
+   LET firsttime = TRUE
+   $(
+      IF x = 0 BREAK
+      SWITCHON x!h1 INTO
+      $(
+         DEFAULT: BREAK
+
+         CASE s.let: CASE s.manifest:
+         CASE s.static: CASE s.global:
+            x := x!h3
+            LOOP
+
+         CASE s.seq:
+            IF x!h2!h1 = s.for DO
+            $(
+               LET name = (x!h2!h2)+h3
+               TEST firsttime
+               THEN $(
+                  writef("*N{*N   %S %S",wdtype,name)
+                  firsttime := FALSE
+               $)
+               ELSE writef(", %S",name)
+            $)
+            x := x!h3
+            LOOP
+
+         CASE s.for:
+            $(
+               LET name = (x!h2)+h3
+               TEST firsttime
+               THEN $(
+                  writef("*N{*N   %S %S",wdtype,name)
+                  firsttime := FALSE
+               $)
+               ELSE writef(", %S",name)
+            $)
+            BREAK
+      $)
+   $) REPEAT
+
+   UNLESS firsttime DO writes("; /** FOR loop variables **/")
+
+   RESULTIS NOT firsttime
+$)
+
+AND TrnAssignment( left, right, leftline, rightline ) BE
+$(
+   newtrn(leftline)
+
+   SWITCHON left ! h1 INTO
+   $(
+      CASE s.comma: CASE s.commawithline:
+         UNLESS right ! h1 = s.comma | right!h1 = s.commawithline DO
+            TrnError("Left and Right sides mismatch")
+         IF left!h1 = s.commawithline DO leftline := left!h4
+         IF right!h1 = s.commawithline DO rightline := right!h4
+         TrnAssignment(left!h2, right!h2, leftline, rightline)
+         left := left ! h3
+         right := right ! h3
+         LOOP
+
+      CASE s.name:
+         writef("*N%S = ",left+h3)
+         newtrn(rightline)
+         TrnExpression(right, TRUE, FALSE)
+         wrch(';')
+         RETURN
+
+      CASE s.slctap:
+      CASE s.rv: CASE s.vecap:
+      vecap:
+         newline()
+         TrnExpression(left, TRUE, FALSE)
+         newtrn(rightline)
+         writes(" = ")
+         TrnExpression(right, TRUE, FALSE)
+         wrch(';')
+         RETURN
+
+      CASE s.byteap:
+         TEST macros
+         THEN $(
+            writes("*Nputbyte( ")
+            TrnExpression(left ! h2, TRUE, FALSE)
+            writes(", ")
+            TrnExpression( left ! h3 , TRUE, FALSE)
+            writes(", ")
+            newtrn(rightline)
+            TrnExpression( right, TRUE, FALSE )
+            writes(");")
+         $)
+         ELSE GOTO vecap
+         RETURN
+
+      DEFAULT:
+         TrnError("Invalid operator on left of assignment")
+         RETURN
+   $)
+$) REPEAT
+
+AND TrnExpression( x , firsttime, logical ) BE
+$(
+   LET op = x ! h1
+   SWITCHON op INTO
+   $(
+      CASE s.byteap:
+         IF NOT macros GOTO vecap
+         writes("getbyte( ")
+         TrnExpression( x!h2, TRUE, FALSE )
+         writes(", ")
+         TrnExpression( x!h3 , TRUE, FALSE )
+         writes(" )")
+         RETURN
+
+      CASE s.fdiv: CASE s.fminus:
+      CASE s.fls: CASE s.fgr: CASE s.fle: CASE s.fge:
+      CASE s.div: CASE s.rem: CASE s.minus:
+      CASE s.ls: CASE s.gr: CASE s.le: CASE s.ge:
+      CASE s.lshift: CASE s.rshift:
+      CASE s.fmult: CASE s.fplus: CASE s.feq: CASE s.fne:
+      CASE s.mult: CASE s.plus: CASE s.eq: CASE s.ne:
+      CASE s.eqv: CASE s.neqv:
+         UNLESS firsttime DO writes("( ")
+         TrnExpression( x ! h2 , FALSE, FALSE)
+         writef(" %S ", operator( op, logical ) )
+         TrnExpression( x ! h3 , FALSE, FALSE)
+         UNLESS firsttime DO writes(" )")
+         breakable := TRUE
+         RETURN
+
+      CASE s.logor: CASE s.logand:
+         UNLESS firsttime DO writes("( ")
+         TrnExpression( x ! h2 , FALSE, logical)
+         writef(" %S ", operator( op, logical ) )
+         TrnExpression( x ! h3 , FALSE, logical)
+         UNLESS firsttime DO writes(" )")
+         breakable := TRUE
+         RETURN
+      
+      CASE s.slctap:
+      slctap:
+      $(
+         TrnExpression( x!h3, TRUE, FALSE)
+         writef( " %S ", operator(op, FALSE))
+         TrnExpression( x!h2, TRUE, FALSE )
+         breakable := TRUE
+         RETURN
+      $)
+      
+      CASE s.vecap:
+      vecap:
+      $(
+         LET v = x!h2
+         LET s = x!h3
+         // Sort out the correct order. var ! const and const ! var are
+         // identical in BCPL. NOT in C !!
+         IF IsConstant( v ) | [s!h1 = s.table] | [s!h1 = s.string]
+         DO $( LET t = v ; v := s ; s := t $)
+
+         IF [v!h1 = s.table] DO
+            Warning("TABLE being subscripted - please check")
+         
+         // We now know that v is variable and s is constant (or variable)
+         // Check to see if the constant really is a constant, and if
+         // it is a manifest rather than a literal constant, convert this 
+         // into a selector application, so that it comes out as a 
+         // structure selection
+         IF (s!h1 = s.name) /\  ((s!h2 & manbit) = manbit)
+         THEN
+         $(
+            op := s.slctap
+            x!h3 := v
+            x!h2 := s
+            GOTO slctap
+         $)
+          
+         IF v!h1 = s.name DO
+            TEST op = s.vecap
+            THEN
+               TEST (v!h2 & bytebit) = 0
+               THEN v!h2 := v!h2 | vecbit
+               ELSE Warning("Variable %s used with '!' - first used with '%%'",v +h3)
+            ELSE
+               TEST (v!h2 & vecbit) = 0
+               THEN v!h2 := v!h2 | bytebit
+               ELSE Warning("Variable %s used with '%%' - first used with '!'",v +h3)
+
+         TEST macros
+         THEN $(
+            writes("pling(")
+            TrnExpression( v , TRUE, FALSE)
+            wrch(',')
+            TrnExpression( s , TRUE, FALSE)
+            wrch(')')
+         $)
+         ELSE $(
+            TrnExpression( v , FALSE, FALSE )
+            writes("[ ")
+            TrnExpression( s , TRUE, FALSE )
+            writes(" ]")
+         $)
+         breakable := TRUE
+         RETURN
+      $)
+
+      CASE s.fabs:
+      CASE s.abs:
+      CASE s.fneg: CASE s.not:
+      CASE s.lv: CASE s.neg:
+      $(
+         LET brackets = VALOF $(
+            SWITCHON x!h2!h1 INTO
+            $(
+            CASE s.name: CASE s.number: CASE s.decimal:
+            CASE s.hex: CASE s.binary: CASE s.char: CASE s.octal:
+            CASE s.fnap: CASE s.float:
+                     RESULTIS FALSE
+            DEFAULT: RESULTIS TRUE
+            $)
+         $)
+         writef((brackets->" %S( "," %S "),operator( op , logical))
+         TrnExpression( x ! h2 , TRUE, logical & [op = s.not])
+         writes(brackets->" )"," ")
+         breakable := TRUE
+         ENDCASE
+      $)
+
+      CASE s.rv:
+         TEST macros
+         THEN $(
+            writes("pling(")
+            TrnExpression( x ! h2, TRUE, FALSE )
+            writes(",0)")
+         $)
+         ELSE $(
+            writef("(%S", operator( op, FALSE ) )
+            TrnExpression( x ! h2, FALSE, FALSE )
+            writes(")")
+         $)
+         breakable := TRUE
+         RETURN
+
+      CASE s.query:
+         wrch('0')
+         breakable := TRUE
+         RETURN
+
+      CASE s.true: CASE s.false:
+         writes(op=s.true->"true","false")
+         breakable := TRUE
+         RETURN
+
+      CASE s.decimal:
+      CASE s.number:
+         writen(x!h2)
+         // wrch('L')
+         breakable := TRUE
+         RETURN
+
+      CASE s.octal:
+         writes("0")
+         my.writeoct(x!h2)
+         // wrch('L')
+         breakable := TRUE
+         RETURN
+
+      CASE s.hex:
+      CASE s.binary:
+         
+         writes("(long) 0x")
+         TEST x!h2 = 0
+         THEN wrch('0')
+         ELSE my.writehex(x!h2)
+         // wrch('L')
+         breakable := TRUE
+         RETURN
+
+      CASE s.char:
+         wrch('*'')
+         TransChar(x!h2)
+         wrch('*'')
+         breakable := TRUE
+         RETURN
+
+      CASE s.float:
+         error("writefp procedure needed*N")
+/*
+         writefp(x!h2, 7, 5)
+         breakable := TRUE
+*/
+         RETURN
+
+      CASE s.string:
+      $(
+         LET s = @ (x!h2)
+         TEST cstrings
+         THEN wrch('*"')
+         ELSE writef("*"\%O3",s%0)
+         FOR i = 1 TO s%0 DO TransChar(s%i)
+         wrch('*"')
+         breakable := TRUE
+         RETURN
+      $)
+
+      CASE s.name:
+         writes(x+h3)
+         breakable := TRUE
+         RETURN
+
+      CASE s.valof:         // C does not have a VALOF equivalent !!!!
+         Warning("VALOF found in expression - please check")
+         writes("VALOF")
+         TrnStat( x ! h2 , TRUE )
+         RETURN
+
+      CASE s.fnap:
+         TrnExpression( x ! h2, FALSE, FALSE )
+         wrch('(')
+         TrnExprList( x ! h3 )
+         wrch(')')
+         breakable := TRUE
+         RETURN
+
+      CASE s.cond:
+         UNLESS firsttime DO writes("( ")
+         writes("(")
+         TrnExpression( x ! h2, TRUE, TRUE )
+         writes(") ? ")
+         TrnExpression( x ! h3, TRUE, FALSE )
+         writes(" : ")
+         TrnExpression( x ! h4, TRUE, FALSE )
+         UNLESS firsttime DO writes(" )")
+         breakable := TRUE
+         RETURN
+
+      CASE s.table:
+         Warning("TABLE found in expression - please check")
+         TrnTable( x )
+         RETURN
+
+      DEFAULT:
+         Warning("Unknown operator in expression %N",op)
+         RETURN
+   $)
+$)
+
+AND TrnTable( x ) BE
+$(
+   writes("{ ")
+   x := x!h2
+   indent := indent + 1
+   WHILE x!h1 = s.comma | x!h1 = s.commawithline DO
+   $(
+      IF x!h1 = s.commawithline
+      DO $( newtrn(x!h4); wrch('*N') $)
+      TrnExpression(x!h2, TRUE, FALSE )
+      writes(", ")
+      x := x ! h3
+   $)
+   TrnExpression( x , TRUE, FALSE )
+   writes(" }")
+   indent := indent - 1
+$)
+
+AND TrnExprList( x ) BE UNLESS x = 0 DO
+$(
+   LET op = x!h1
+   UNLESS op = s.comma | op = s.commawithline
+   DO $( TrnExpression(x, TRUE, FALSE); RETURN $)
+   IF op = s.commawithline DO newtrn(x!h4)
+   TrnExpression( x!h2, TRUE, FALSE )
+   writes(", ")
+   x := x!h3
+$) REPEAT
+
+AND my.writeoct( n ) BE UNLESS n = 0 DO
+$(
+   my.writeoct( n>>3 )
+   wrch('0' + (n&7) )
+$)
+
+AND my.writehex( n ) BE UNLESS n = 0 DO
+$(
+   my.writehex( n >> 4 )
+   wrch( "0123456789ABCDEF"%( ( n & 15 ) + 1 ) )
+$)
+
+AND TransChar( c ) BE
+$(
+   SWITCHON c INTO
+   $(
+      CASE '*N': writes("\n"); ENDCASE
+      CASE '*T': writes("\t"); ENDCASE
+      CASE '*B': writes("\b"); ENDCASE
+      CASE '*C': writes("\r"); ENDCASE
+      CASE '*P': writes("\f"); ENDCASE
+      CASE '\' : writes("\\"); ENDCASE
+      CASE '*'': writes("\*'"); ENDCASE
+      CASE '*"': writes("\*""); ENDCASE
+      DEFAULT:
+         TEST '*S' <= c <= '~'
+         THEN wrch(c)
+         ELSE writef("\%O3",c)
+   $)
+$)
+
+AND operator(op, logical) = VALOF
+$(
+   SWITCHON op INTO
+   $(
+      DEFAULT:
+         Warning("Unknown operator in OPERATOR %N (internal error)",op)
+         RESULTIS "??"
+      CASE s.slctap:  RESULTIS "->"
+      CASE s.rv:
+      CASE s.fmult:
+      CASE s.mult:    RESULTIS "**"
+      CASE s.fdiv:
+      CASE s.div:     RESULTIS "/"
+      CASE s.rem:     RESULTIS "%"
+      CASE s.fplus:
+      CASE s.plus:    RESULTIS "+"
+      CASE s.fminus:
+      CASE s.fneg:
+      CASE s.neg:
+      CASE s.minus:   RESULTIS "-"
+      CASE s.feq:
+      CASE s.eq:      RESULTIS "=="
+      CASE s.fne:
+      CASE s.ne:      RESULTIS "!="
+      CASE s.fls:
+      CASE s.ls:      RESULTIS "<"
+      CASE s.fgr:
+      CASE s.gr:      RESULTIS ">"
+      CASE s.fle:
+      CASE s.le:      RESULTIS "<="
+      CASE s.fge:
+      CASE s.ge:      RESULTIS ">="
+      CASE s.lshift:  RESULTIS "<<"
+      CASE s.rshift:  RESULTIS ">>"
+      CASE s.logand:  RESULTIS logical->"&&","&"
+      CASE s.logor:   RESULTIS logical->"||","|"
+      CASE s.neqv:    RESULTIS "^"
+      CASE s.not:     RESULTIS logical->"!","~"
+      CASE s.lv:      RESULTIS "&"
+      CASE s.fabs:    RESULTIS "fabs"
+      CASE s.abs:     RESULTIS "abs"
+      CASE s.eqv:
+         warning("EQV operator found in expression - this has no C equivalent")
+         RESULTIS "EQV"
+   $)
+$)
+
+AND TrnError( format, a,b,c,d,e ) BE
+$(
+   LET out = output()
+   selectoutput( sysstream )
+   wrch := blib.wrch
+   writef("****** Error near line %n",trnline REM 100000)
+
+   TEST trnline >= 100000
+   THEN $(
+      LET n = trnline/100000
+      LET p = getchain
+      FOR i = 1 TO ngets-n DO p := !p
+      writef("of GET file %S: ",p+5)
+   $)
+   ELSE writes(": ")
+   writef(format, a,b,c,d,e )
+   newline()
+   selectoutput(out)
+   longjump( err.p, err.l )
+$)
+
+AND Warning( format, a,b,c,d,e ) BE
+$(
+   LET out = output()
+   selectoutput( sysstream )
+   wrch := blib.wrch
+   writef("****** Warning near output line %n: ",outline)
+   writef(format, a,b,c,d,e )
+   newline()
+   selectoutput(out)
+   wrch := my.wrch
+$)
+
+// evaluates the step expression of a for loop
+// allows for +ve and -ve numeric constants only
+AND evalstep( x ) = VALOF
+$(
+   SWITCHON x ! h1 INTO
+   $(
+      DEFAULT:
+         warning("FOR loop step expression too complex - please check")
+         RESULTIS 1000000
+
+      CASE s.number:
+      CASE s.decimal:
+      CASE s.octal:
+      CASE s.hex:
+      CASE s.char:
+      CASE s.binary:
+         RESULTIS x!h2
+
+      CASE s.neg:
+         RESULTIS - evalstep( x!h2 )
+
+   $)
+$)
+
+// Returns TRUE if the given expression is a constant
+AND IsConstant( x ) = VALOF
+$(
+   SWITCHON x!h1 INTO
+   $(
+      DEFAULT:
+         Warning("Unknown operator in expression: %N",x!h1)
+         RESULTIS FALSE
+
+      CASE s.fdiv: CASE s.fminus:
+      CASE s.fls: CASE s.fgr: CASE s.fle: CASE s.fge:
+      CASE s.div: CASE s.rem: CASE s.minus:
+      CASE s.ls: CASE s.gr: CASE s.le: CASE s.ge:
+      CASE s.lshift: CASE s.rshift:
+      CASE s.fmult: CASE s.fplus: CASE s.feq: CASE s.fne:
+      CASE s.mult: CASE s.plus: CASE s.eq: CASE s.ne:
+      CASE s.logand: CASE s.logor: CASE s.eqv: CASE s.neqv:
+         RESULTIS IsConstant(x!h2) -> IsConstant(x!h3), FALSE
+
+      CASE s.number: CASE s.decimal: CASE s.hex:
+      CASE s.octal: CASE s.char: CASE s.slct:
+         RESULTIS TRUE
+
+      CASE s.name:
+         RESULTIS ( ( x ! h2 ) & manbit ) = manbit
+      
+      
+      CASE s.abs: CASE s.fabs:
+      CASE s.neg: CASE s.fneg:
+      CASE s.not:
+         RESULTIS IsConstant(x!h2)
+
+      CASE s.slctap:
+      CASE s.rv: CASE s.cond: CASE s.query:
+      CASE s.lv: CASE s.string: CASE s.valof:
+      CASE s.vecap: CASE s.byteap:
+      CASE s.fnap: CASE s.table:
+         RESULTIS FALSE
+
+      CASE s.true: CASE s.false:
+         RESULTIS TRUE
+
+   $)
+$)
+
+// Attempts to determine the type of the expression from the
+// operators and the constants etc.
+AND TypeOf( x ) = VALOF
+$(
+   SWITCHON x!h1 INTO
+   $(
+      DEFAULT:
+         Warning("Unknown operator in expression: %N",x!h1)
+         RESULTIS s.number
+
+      CASE s.fdiv: CASE s.fminus:
+      CASE s.fls: CASE s.fgr: CASE s.fle: CASE s.fge:
+      CASE s.div: CASE s.rem: CASE s.minus:
+      CASE s.ls: CASE s.gr: CASE s.le: CASE s.ge:
+      CASE s.lshift: CASE s.rshift:
+      CASE s.fmult: CASE s.fplus: CASE s.feq: CASE s.fne:
+      CASE s.mult: CASE s.plus: CASE s.eq: CASE s.ne:
+      CASE s.logand: CASE s.logor: CASE s.eqv: CASE s.neqv:
+      $(
+         LET a = TypeOf(x!h2)
+         LET b = TypeOf(x!h3)
+         RESULTIS a = b -> a, s.number
+      $)
+
+      CASE s.number: CASE s.decimal: CASE s.hex:
+      CASE s.octal: CASE s.binary:   CASE s.slct:
+         RESULTIS s.number
+
+      CASE s.float: RESULTIS s.float
+
+      CASE s.char: RESULTIS s.char
+
+      CASE s.name:
+         RESULTIS (x!h2) & NOT bitsmask
+
+      CASE s.abs: CASE s.fabs:
+      CASE s.neg: CASE s.fneg:
+      CASE s.not:
+         RESULTIS TypeOf(x!h2)
+
+      CASE s.rv: CASE s.cond: CASE s.query:
+      CASE s.lv: CASE s.fnap: CASE s.valof:
+      CASE s.vecap: CASE s.slctap:
+         RESULTIS s.number
+
+      CASE s.byteap: RESULTIS s.char
+      CASE s.string: RESULTIS s.string
+      CASE s.table:  RESULTIS s.table
+
+
+      CASE s.true: CASE s.false:
+         RESULTIS s.number
+
+   $)
+$)
+
+AND dobreaklabel() BE
+$(
+   UNLESS breaklabel RETURN
+   indent := indent - 1
+   writef("*Nbreaklabel%N:",curloop)
+   indent := indent + 1
+$)
+
+AND newloop() = VALOF
+$(
+   loopLabel := loopLabel + 1
+   
+   RESULTIS looplabel
+$)

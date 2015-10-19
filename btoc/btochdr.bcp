@@ -1,0 +1,74 @@
+MANIFEST $( ug = 150 $)
+
+GLOBAL
+$(
+// Joint Globals
+
+rc             : ug + 0
+linecount      : ug + 1
+newvec         : ug + 2
+getp           : ug + 3
+prsource       : ug + 4
+ngets          : ug + 5
+chbuf          : ug + 6
+getchain       : ug + 7
+cstream        : ug + 8
+worksize       : ug + 9
+sysstream      : ug + 10
+fromfile       : ug + 11
+
+error          : ug + 21
+tidyup         : ug + 22
+
+formtree:177   // ug + 27
+btoc:178       // ug + 28
+
+
+// LEX only globals
+uppercase      : ug + 12
+pptrace        : ug + 13
+tagchartable   : ug + 14
+charcode       : ug + 15
+sourcestream   : ug + 16
+lispopt        : ug + 17
+condtaglist    : ug + 18
+uppercasestring : ug + 19
+findget        : ug + 20
+
+
+// SYN only globals
+
+warnmax        : ug + 29
+warncount      : ug + 30
+reportmax      : ug + 31
+reportcount    : ug + 32
+quiet          : ug + 33
+err.l          : ug + 34
+err.p          : ug + 35
+sectionname    : ug + 36
+workbase       : ug + 37
+treep          : ug + 38
+mdef           : ug + 39
+
+
+
+workvec        : ug + 40
+
+// TOC Globals
+
+comments       : ug + 41
+comm.tail      : ug + 42
+cbuf           : ug + 43
+macros         : ug + 44
+nohdrs         : ug + 45
+cstrings       : ug + 46
+wdtype         : ug + 47
+stringtype     : ug + 48
+externals      : ug + 49
+readhdrs       : ug + 50
+$)
+
+MANIFEST
+$(
+   pg = ug + 100
+$)

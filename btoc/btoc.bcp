@@ -1,0 +1,328 @@
+$<UNIX
+GET "LIBHDR"
+$>UNIX
+$<UNIX'
+GET "BCPL_DIR:LIBHDR"
+$>UNIX'
+
+GET "btochdr.bcp"
+GET "synhdr.bcp"
+GET "string-t.bcp"
+
+EXTERNAL
+$(
+   getEnv:"_getenv"   // To handle default include directory
+$)
+
+LET start() BE
+$(
+   LET argv   = VEC 40
+   LET Args   = "FROM/A,TO,SIZE/K,OPT/K,TAGS/K,WORD/K,STRING/K,DEFINE/K"
+   LET sn     = VEC 3
+   LET ctl    = VEC 64
+   LET errors = FALSE
+   LET predefs = VEC 40
+   
+   sysstream := output()
+   sectionname := sn
+   condtaglist := ctl
+   ctl%0 := 0
+   pptrace := FALSE
+   uppercase := capitalch
+   getp := 0
+   sourcestream := 0
+   workvec :=  0
+   worksize := 15000
+   cstream := 0
+   warnmax := 10
+   warncount := 0
+   reportmax := 10
+   reportcount := 0
+   quiet := FALSE
+   rc := 0
+   pptrace := FALSE
+   prsource := FALSE
+   lispopt := FALSE
+   ngets := 0
+   getchain := 0
+   linecount := 1
+   comments := 0
+   comm.tail := @comments
+      
+   tagchartable := TABLE  // chars acceptable in tags
+         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+   
+   FOR j = '0' TO '9' DO putbyte(tagchartable,j,j) 
+   FOR j = 'a' TO 'z' DO putbyte(tagchartable,j,j)  
+   FOR j = 'A' TO 'Z' DO putbyte(tagchartable,j,j)
+ 
+   putbyte(tagchartable,'.','.')
+   putbyte(tagchartable,'_','_')
+       
+   IF rdargs( args, argv, 40) = 0 DO
+      error("Bad args for '%S'*N",args)
+        
+   sourcestream := findinput( argv!0 )
+   IF sourcestream = 0 DO
+      error("Cannot open %S*N",argv!0)
+   fromfile := argv!1
+
+   TEST argv!1 = 0 
+   THEN
+      cstream := sysstream
+   ELSE
+   $(  
+      cstream := findoutput( argv!1 )
+      IF cstream = 0 DO
+         error("Cannot open %S*N",argv!1)
+   $)
+   
+   IF argv!2 \= 0 DO
+   $(
+      UNLESS string.to.number(argv!2) DO
+         error("Invalid number given for worksize: %S*N",argv!2)
+      worksize := result2
+   $)
+
+   wdtype     := argv!5 = 0 -> "int32", argv!5
+   stringtype := argv!6 = 0 -> "unsigned char **", argv!6
+
+   UNLESS Argv!4 = 0 DO
+   $(
+      LET tags = argv!4
+      FOR i = 0 TO tags%0 DO ctl%i := tags%i
+   $)
+   ctl%0 := ctl%0 + 1
+   ctl%(ctl%0) := ':'
+
+   // set options to default
+   macros := FALSE
+   nohdrs := TRUE
+   readhdrs  := TRUE
+   cstrings  := TRUE
+   externals := TRUE
+
+   UNLESS argv!3 = 0 DO
+   $(
+      LET ostr = argv!3
+      FOR i = 1 TO ostr%0 DO
+         SWITCHON capitalch(ostr%i) INTO
+         $(
+         DEFAULT:
+            writef("Invalid option '%C' - ignored*N",ostr%i)
+            ENDCASE
+         CASE 'M': macros := NOT macros;    ENDCASE
+         CASE 'H': nohdrs := NOT nohdrs;   ENDCASE
+         CASE 'C': cstrings := NOT cstrings ;  ENDCASE
+         CASE 'E': externals := NOT externals; ENDCASE
+         $)
+   $)
+   predefs%0 := 0
+   IF argV!7 \= 0
+   THEN
+   $(
+      LET defs =  argV!7
+      LET o = 1
+      
+      FOR i = 1 TO defs%0
+      DO
+      $(
+	 LET ch = 'a' <= defs%i <= 'z' -> defs%i - 'a' + 'A', defs%i
+	 
+	 SWITCHON ch INTO
+	 $(
+	    CASE '*S':
+	    CASE ',':
+	       UNLESS (o = 1) \/ (preDefs%(o-1) = '/')
+	       DO
+	       $(
+		  preDefs%o := '/'
+		  o := o+1
+	       $)
+	       ENDCASE
+	     DEFAULT:
+	       IF (ch \= '$') /\ ((o=1) \/ (preDefs%(o-1) ='/'))
+	       THEN
+	       $(
+		  preDefs%o := '$'
+		  o := o+1
+	       $)
+	       preDefs%o := ch
+	       o := o+1
+	       ENDCASE
+	 $)
+      $)
+      predefs%o := '/'
+      predefs%0 := o
+   $)
+
+   workvec := getvec( worksize )
+
+   IF workvec = 0 DO error("Cannot get workspace")
+      
+   UNTIL sourcestream = 0 DO
+   $(
+      LET a = ?
+      LET worktop = ?
+
+      workbase := workvec
+      worktop := workbase + worksize
+      treep := worktop
+      selectinput( sourcestream )
+      !sectionname := 0
+
+      cbuf := newvec( 100 )
+      !cbuf := 0
+      
+      a := formtree(predefs)
+
+      IF reportcount > 0 DO errors := TRUE
+
+      IF rc > 0 DO
+      $(
+         endread()
+         sourcestream := 0
+         BREAK
+      $)
+
+      UNLESS sourcestream = 0 DO
+          TEST rdch() = ENDSTREAMCH
+          THEN $( endread(); sourcestream := 0 $)
+          ELSE unrdch()
+
+      IF A = 0
+      $(
+          writes("No program to compile*N")
+          BREAK
+      $)
+
+      writef("%N%% workspace used*N",((worktop-treep)*100)/worksize)
+      
+      UNLESS cstream = sysstream
+      THEN
+         selectoutput(cstream)
+
+      workbase := workvec
+
+      btoc(a)
+
+      IF reportcount > 0 DO errors := TRUE
+
+      IF rc > 0      // if the btoc failed
+      DO $(
+         endread()
+         sourcestream := 0
+      $)
+      
+      UNLESS cstream = sysstream
+      THEN
+         selectoutput( sysstream )
+   $)
+
+   tidyup(0)
+$)
+
+AND error(format, a,b,c,d,e,f) BE
+$(
+   writef(format, a,b,c,d,e,f)
+   tidyup(20)
+$)
+
+AND tidyup(rc) BE
+$(
+   UNLESS sourcestream = 0 DO endstream( sourcestream )
+   UNLESS cstream = 0 DO $( selectoutput(cstream) ; endwrite() $)
+   UNLESS workvec = 0 DO freevec( workvec )
+   stop(rc)
+$)
+
+AND uppercasestring(s) BE
+   FOR i = 1 TO getbyte(s, 0)
+   DO putbyte(s, i, uppercase(getbyte(s, i)))
+
+AND charcode(ch) = ch
+
+AND newvec(n) = VALOF
+    $(  treep := treep - n - 1
+        IF treep <= workbase THEN caereport(-98)
+        RESULTIS treep  $)
+
+AND findGet( WordV ) = VALOF
+$( // Look first in current directory
+   LET inStream = findinput( WordV )
+   LET nameV    = VEC 256/bytesPerWord
+   LET includeDir = VEC 256/bytesPerWord
+   LET envName = VEC 5
+   LET envP = 0
+      
+   IF inStream \= badStatus
+   THEN
+      RESULTIS inStream
+      
+   // Try adding .bcp to the name
+   copyString( nameV, wordV)
+   addSuffix( nameV,".bcp")
+
+   
+   instream := findinput( nameV )
+   IF inStream \= badStatus
+   THEN
+      RESULTIS inStream
+   
+   // Still haven't got it, try looking in the BCPLINCLUDE directory
+   // if it exists
+   // This frig because the VMS compiler doesn't
+   // handle *X00 in a string, and looks at it even though it isn't going
+   // to be compiled !
+   copyString( envname, "BCPLINCLUDE" )
+   envName%(envName%0 + 1) := 0
+     
+   envP := getEnv( (envName << 2) + 1 )
+   IF envP = 0
+   THEN
+      RESULTIS badStatus
+   
+   cSt2Bst( envP, includeDir )
+   addSuffix(includeDir,"/")
+   copyString(nameV,includeDir)
+   addSuffix(nameV,WordV)
+ 
+   instream := findinput( nameV )
+   IF inStream \= badStatus
+   THEN
+      RESULTIS inStream
+   addSuffix(nameV, ".bcp")
+
+   instream := findinput( nameV )
+   IF inStream \= badStatus
+   THEN
+      RESULTIS inStream
+   RESULTIS badStatus
+$)   
+
+AND copyString( dest.p, source.p) = VALOF
+$(
+   FOR i = 0 TO source.p%0 DO
+      dest.p%i := source.p%i
+
+   RESULTIS dest.p
+$)
+
+AND addSuffix( dest.p, source.p) = VALOF
+$(
+   LET l2 = source.p%0
+   LET l1 = dest.p%0
+
+   IF l1+l2 > 255
+   THEN
+      l2 := 255-l1
+
+   FOR i = 1 TO l2 DO
+      dest.p%(l1 + i) := source.p%i
+
+   dest.p%0 := l1 + l2
+   RESULTIS dest.p
+$)

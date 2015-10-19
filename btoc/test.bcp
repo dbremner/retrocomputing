@@ -1,0 +1,20 @@
+
+LET davol(one, two,three) = VALOF
+$(
+   SWITCHON one INTO 
+   $(
+      CASE 1: RESULTIS 1
+      ENDCASE
+      CASE 2: RESULTIS 2
+      ENDCASE
+      CASE 3: RESULTIS 3
+      ENDCASE
+      CASE 4: RESULTIS 4
+      ENDCASE
+      DEFAULT:
+         RESULTIS 0
+   $)
+   
+   RESULTIS someFunct(one,two,three)  
+$)
+

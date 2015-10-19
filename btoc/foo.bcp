@@ -1,0 +1,14 @@
+// The first line in the file
+// The second
+/* A block        */
+/* comment        */
+GET "LIBHDR"
+
+LET STart() BE
+$( // Start of block
+   LET x = 0
+   LET y = 1  // Init y
+   
+   // A comment in the body
+   RETURN
+$)

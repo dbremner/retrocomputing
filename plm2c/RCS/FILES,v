@@ -1,0 +1,103 @@
+head	1.4;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.4
+date	94.09.26.21.53.21;	author esr;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	94.09.26.21.52.38;	author esr;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	94.09.26.21.49.30;	author esr;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	94.09.26.21.07.24;	author esr;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@README
+CAVEATS.DOC
+FILES
+Makefile
+const.c
+context.c
+control.c
+convert.c
+cvt.h
+cvt_id.h
+decl_out.c
+declare.c
+defs.h
+error.c
+io.c
+lit.c
+main.c
+makefile.ibm
+mem.c
+misc.h
+parse.c
+struct.h
+test.c.out
+test.plm
+tkn_defs.h
+tkn_ext.h
+token.c
+tokens.h
+typedefs.c
+version.c
+@
+
+
+1.3
+log
+@Ooops again.
+@
+text
+@d1 1
+a1 1
+[DREADME
+@
+
+
+1.2
+log
+@Ready for Museum release.
+@
+text
+@d1 1
+a1 1
+README
+d4 1
+a17 1
+makefile
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a3 1
+at_decl.cvt
+@

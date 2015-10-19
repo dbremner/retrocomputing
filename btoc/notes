@@ -1,0 +1,205 @@
+.macro par
+.ensure 4
+.space 1
+.mend
+.macro heading
+.sp 2
+.ensure 10
+.inc 1
+.bold 2
+%1.
+.mend
+.macro display
+.copy
+.nojustify
+.mend
+.macro endd
+.fill
+.justify
+.mend
+.set 1
+.fill
+.justify
+.foot %c-%p-
+.space 3
+%C%UNotes on the use of BTOC
+.sp 3
+.heading
+Invoking BTOC
+.par
+The Rdargs string of BTOC is as follows:
+.display
+
+"FROM/A,TO,SIZE/K,OPT/K,TAGS/K,WORD/K,STRING/K"
+
+.endd
+FROM is the source file, this should be a valid BCPL program.
+TO is the destination file, if not present the output is sent to the terminal.
+SIZE allows the workspace size to be set, the default is 15000 words.
+OPT is an option string of single letter options as follows:
+.display
+.tabset 3 20
+.ensure 10
+
+%TLetter%TOption
+
+%TM%TControls translation of indirection operations (see later)
+%TH%TInclude headers in output, otherwise they are read but no
+%T%Toutput is generated.
+%TC%TInhibit inclusion of length count byte in strings (i.e C format
+%T%Tstring rather than BCPL format string).
+%TE%Tprefix the specifier %Bextern%B to all translated GLOBALS.
+    
+.endd
+TAGS is a string of the form "$<tag1>,...,$<tagN>" which causes the given
+conditional compilation tags to be set true.
+WORD and STRING control type defintions (see later).
+.heading
+Indirection Operators
+.par
+The BCPL indirection operator ( '!' ) is essentially equivalent to vector
+application in C.
+A major difference is that whereas indirection is commutative, vector
+application is not, i.e. %Ba!b%B and %Bb!a%B are both valid in BCPL wheras one
+of %Ba[b]%B and %Bb[a]%B will be illegal in C.
+Since BCPL programmers are inconsistent in how they write indirections, BTOC
+attempts to discover which expression is the vector and which the subscript.
+It is not always entirely successful, but any errors will be cought by the C
+compiler.
+.par
+The M option determines how indirections will be
+translated as follows:
+.display
+.tabset 4 22 43
+.ensure 8
+
+%TBCPL%TDefault%Twith M option
+
+%Ta!b%Ta[b] OR b[a]%Tpling(a,b)
+%T!a%T*a%Tpling(a,0)
+%Ta%%b%Ta[b]%Tgetbyte(a,b)
+%Ta%%b := c%Ta[b] = c%Tputbyte(a,b,c)
+
+.endd
+The macros should be supplied by the user, but the following should work in
+most cases:
+.display
+.tabset 9 25
+.ensure 5
+
+#define%Tpling(a,b)%T(((word)(a))[(word)(b)])
+#define%Tgetbyte(a,b)%T((((string)(a))[(word)(b)]) & 0xFF)
+#define%Tgetbyte(a,b,c)%T(((string)(a))[(word)(b)]) = (char)(c)
+
+.endd
+.heading
+Types
+.par
+A BCPL program contains insufficient information to determine the type of a
+variable precisely; and in any case some variables will be poly-morphic.
+BTOC attempts to make a guess at the type of a variable from its initialising
+expression as follows:
+.display
+.tabset 4 34
+.ensure 8
+
+%TBCPL%TC
+
+%TLET x = "..."%Tstring x = "...";
+%TLET x = VEC N%Tword x[N];
+%TLET x = TABLE a1,...,aN%Tstatic word x[] = { a1,...,aN };
+%TLET x = <expression>%Tword x = <expression>;
+
+.endd
+The types used here %Bword%B and %Bstring%B must be user defined.
+The important point is that for most BCPL programs to work properly the
+datatype defined by %Bword%B should be capable of containing a pointer.
+If a program which assumes 32 bit words is translated %Blong%B integers must
+be used.
+The following definitions should work in most C implementations:
+.display
+.ensure 4
+
+typedef long word;
+typedef char* string;
+
+.endd
+If the type names %Bword%B and %Bstring%B clash with any names used in the
+program they may be changed by use of the WORD and STRING arguments on the
+command line.
+.heading
+VALOF, BREAK and TABLEs
+.par
+Some constructs in BCPL do not translate directly into equivalent constructs in
+C.
+The most important of these is the VALOF construct.
+This is used mostly in the definition of functions where the special case is
+detected and catered for, but when it appears in an ordinary expression BTOC
+will generate a warning message.
+It will translate the block of code as normal but will leave the VALOF keyword
+in the output as a reminder.
+Human intervention is required to convert this to a valid C program.
+.par
+The BCPL BREAK and ENDCASE consructs both translate to the C %Bbreak%B
+construct.
+Most of the time this is problem free, but when a BREAK is present in a
+SWITCHON inside a loop the simple translation will have the wrong effect.
+BTOC will therefore translate this into a %Bgoto%B to a label beyond the end of
+the loop.
+A warning message is generated so the programmer can check that this
+translation is correct and the label does not clash.
+.par
+All instances of TABLE constructs are detected and reported.
+When one is used to initialise a variable (see above) BTOC can translate
+it correctly.
+If however it appears elsewhere, and particularly on one side of an
+indirection, human intervention is required.
+The usual solution is to initialise a static variable with the TABLE and use tha
+t
+in its place in the expression.
+.heading
+Suggested Method of Working
+.par
+1) Pass all headers and sources through CASECH to standardise case conventions
+and to make working copies. It may also be useful to take a listing at this
+point.
+.par
+2) Pass the headers through BTOC with the E option on.
+.par
+3) Pass the program sources through BTOC with the M and C options set as
+required, record any warnings generated by the program.
+.par
+4) Edit each source, add %B#include%B lines for each header file, tidy up the
+comments, fix up any constructs BTOC generated warnings for and alter the types
+of any variables where it appears necessary (particularly procedure
+parameters and function results).
+It will also be necessary to alter types in the header files, in particular any
+external functions must be declared as such.
+This is also the time to rewrite any system dependant code like command line
+decoding, storage management and input/output.
+A possible solution to this is to write (or translate via BTOC)
+procedures which conform in
+name and function to the BCPL routines used in the program; this is
+particularly useful if the program does a lot of string handling.
+.par
+5) Pass each source through the C compiler or %Blint%B and collect the output
+(which may be quite considerable).
+Most of the messages generated should be type errors and warnings.
+These can be dealt with mostly by altering the type defintions of variables or
+introducing casts into expressions.
+While the errors must be eliminated the warnings can be ignored, although it is
+good practice to dispose of these too.
+It may be necessary to introduce non-external type definitions for
+functions in the file
+if they produce a result and are the subject of a forward reference (I don't
+really understand why the C compiler cannot pick up the type of forward
+references, it is multi-pass after all).
+.par
+6) Extract all the externally referenced variables from the header files
+and put these together into one file.
+Remove the %Bextern%B keyword from each and add any initialisation which may be
+required.
+This file should now be compiled and added to the set of sources.
+.par
+NOTE: if the program being translated consists of a single source file steps
+2 and 6 may be omitted.

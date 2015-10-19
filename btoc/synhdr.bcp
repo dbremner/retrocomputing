@@ -1,0 +1,128 @@
+MANIFEST $(   // AE operators and symbols
+s.number=1; s.name=2; s.string=3; s.true=4; s.false=5
+s.valof=6; s.lv=7; s.rv=8; s.vecap=9; s.fnap=10
+s.mult=11; s.div=12; s.rem=13
+s.plus=14; s.minus=15; s.neg=17
+s.fix=18; s.abs=19
+s.eq=20; s.ne=21; s.ls=22; s.gr=23; s.le=24; s.ge=25
+s.byteap=28
+s.not=30; s.lshift=31; s.rshift=32; s.logand=33; s.logor=34
+s.eqv=35; s.neqv=36; s.cond=37; s.comma=38; s.table=39
+
+s.and=40; s.valdef=41; s.vecdef=42; s.constdef=43
+s.fndef=44; s.rtdef=45
+s.macro=46
+s.needs:48;s.section=49
+s.ass=50; s.rtap=51; s.goto=52; s.resultis=53
+s.colon=54
+s.test=55; s.for=56; s.if=57; s.unless=58
+s.while=59; s.until=60; s.repeat=61; s.repeatwhile=62
+s.repeatuntil=63; s.loop=65; s.break=66; s.return=67; s.finish=68
+s.endcase=69; s.switchon=70; s.case=71; s.default=72
+s.seq=73; s.let=74; s.manifest=75; s.global=76; s.static=79
+
+s.query=80; s.cont=81
+s.slct = 82; s.slctap = 83
+    // floating point AE operators
+
+s.fmult=267; s.fdiv=268;
+s.fplus=270; s.fminus=271; s.fneg=273
+s.float=274; s.fabs=275
+s.feq=276; s.fne=277; s.fls=278; s.fgr=279; s.fle=280; s.fge=281
+
+flbit=256; becomesbit=512
+$)
+
+MANIFEST $(   // other canonical symbols
+s.be=89; s.end=90; s.lsect=91; s.rsect=92; s.get=93
+s.semicolon=97; s.into=98; s.to=99; s.by=100; s.do=101; s.or=102
+s.vec=103; s.lparen=105; s.rparen=106
+s.lcond=111; s.rcond=112; s.condname=113
+
+s.commawithline=114
+
+s.lcode=120;   s.rcode=121;    s.code=122
+
+
+    // ACN specials for Lisp
+ 
+    s.car                      = 128
+    s.cdr                      = 129
+    s.lle                      = 130
+    s.lge                      = 131
+    s.lls                      = 132
+    s.lgr                      = 133
+    s.nil                      = 134
+    s.stindb                   = 135
+    s.stnil                    = 136
+
+    s.decimal                  = 160
+    s.hex                      = 161
+    s.octal                    = 162
+    s.char                     = 163
+    s.float                    = 164
+    s.binary                   = 165
+ 
+    nilglobalnumber            = 150
+
+
+$)
+
+MANIFEST $(    //  selectors
+h1=0; h2=1; h3=2; h4=3; h5=4; h6=5
+$)
+
+GLOBAL $(    // globals used in LEX
+decval:pg+0
+wordv:pg+4
+wordsize:pg+5
+charv:pg+6
+charp:pg+7
+skipping:pg+8
+symb:pg+9
+wordnode:pg+10
+ch:pg+11
+rdtag:pg+12
+nextsymb:pg+13
+declsyswords:pg+14
+nlpending:pg+15
+tagstack:pg+16
+tagp:pg+17
+lookupword:pg+18
+rch:pg+19
+wrchbuf:pg+20
+chcount:pg+21
+nulltag:pg+22
+rec.p:pg+23
+rec.l:pg+24
+readfloat:pg+25
+readnumber:pg+26
+$)
+
+GLOBAL $(   // globals used in SYN
+rdblockbody:pg+27
+rdsect:pg+28
+rnamelist:pg+29
+rname:pg+30
+rexp:pg+31
+rdef:pg+32
+rcom:pg+33
+rdcdefs:pg+34
+nametable:pg+35
+nametablesize:pg+36
+caereport:pg+37
+checkfor:pg+38
+ignore:pg+39
+performget:pg+40
+rexplist:pg+41
+list1:pg+42
+list2:pg+43
+list3:pg+44
+list4:pg+45
+list5:pg+46
+//newvec:pg+47  moved to start
+list6:pg+48
+rbexp:pg+49
+prline:pg+50
+mdef:pg+51
+$)
