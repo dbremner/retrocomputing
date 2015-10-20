@@ -1,7 +1,6 @@
 #include <stdio.h>
-#ifdef IBMPC
 #include <stdlib.h>
-#endif
+#include <string.h>
 #include "misc.h"
 #include "defs.h"
 #include "cvt.h"

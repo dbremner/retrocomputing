@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <string.h>
 #include "misc.h"
 #include "defs.h"
 #include "cvt.h"

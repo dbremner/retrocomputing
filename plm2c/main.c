@@ -1,11 +1,9 @@
 #include <stdio.h>
-#ifdef IBMPC
+#include <string.h>
 #include <stdlib.h>
-#include <sys\stat.h>
-#else
 #include <sys/types.h>
 #include <sys/stat.h>
-#endif
+#include <unistd.h>
 #include <fcntl.h>
 #include "misc.h"
 #include "defs.h"
