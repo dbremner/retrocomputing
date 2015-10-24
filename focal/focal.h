@@ -60,7 +60,7 @@ struct	sym
 	int	s_subs;			/* Subscript */
 	union	{
 		double	s_value;	/* The data */
-		double	(*s_fp)();	/* Function pointer */
+		double	(*s_fp)(double);	/* Function pointer */
 	} s_un;
 	char	s_id[1];			/* Name */
 };

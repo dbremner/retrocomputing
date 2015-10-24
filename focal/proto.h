@@ -1,5 +1,5 @@
 int	main (void);
-void	builtin (char *cp, double (*fp)(double));
+void	builtin (const char *cp, double (*fp)(double));
 void	process (void);
 void	ask (void);
 void	badline (void);
@@ -17,7 +17,7 @@ void	erasesyms (void);
 double	eval (void);
 double	primary (void);
 double	term (void);
-struct sym	*lookup (char *id, int type, int subs);
+struct sym	*lookup (const char *id, int type, int subs);
 struct sym	*getsym (void);
 
 double	fsin (double arg);
@@ -34,10 +34,10 @@ double	fran (double arg);
 void	library (void);
 void	catchcc (void);
 void	onintr (void);
-void	putline (struct line *lp, FILE *fp);
+void	putline (const struct line *lp, FILE *fp);
 void	getlno (struct lno *lnop, int c);
 int	getnum (int c);
-struct line	*alocline (char *cp);
+struct line	*alocline (const char *cp);
 void	diag (const char *s);
 int	getnb (void);
 double	drand48 (void);

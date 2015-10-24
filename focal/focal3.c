@@ -12,7 +12,7 @@
  * Used any time a source line is
  * printed.
  */
-void putline(struct line *lp, FILE *fp)
+void putline(const struct line *lp, FILE *fp)
 {
 	fprintf(fp, "%02d.%02d %s\n", lp->l_gno, lp->l_lno, lp->l_text);
 }
@@ -95,7 +95,7 @@ int getnum(int c)
  * Return a pointer to the line.
  */
 struct line *
-alocline(char *cp)
+alocline(const char *cp)
 {
 	struct line *lp = NULL;
 

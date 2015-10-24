@@ -142,7 +142,7 @@ term(void)
 
 
 struct	sym *
-lookup(char *id, int type, int subs)
+lookup(const char *id, int type, int subs)
 {
 	struct sym *sp;
 	int	ix;

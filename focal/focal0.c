@@ -102,7 +102,7 @@ int main()
  * the functions into the table, and
  * never used again!
  */
-void builtin(char *cp, double (*fp)(double))
+void builtin(const char *cp, double (*fp)(double))
 {
 	struct sym *sp = NULL;
 	int	ix;
