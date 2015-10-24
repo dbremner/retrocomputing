@@ -97,6 +97,7 @@ parse_error(char *error_string)
 void
 control_error(char *error_string)
 {
+    (void)error_string;
 #ifdef IGNORE_CONTROL_ERRORS
 	parse_mesg("", "", LF);
 #else

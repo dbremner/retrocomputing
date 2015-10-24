@@ -296,8 +296,6 @@ get_element(DECL_MEMBER **element, TOKEN *token)
 	char		*tmp_text_ptr;
 	char		*tmp_out_string;
 
-	char		*get_mem();
-
 	get_element_ptr(element);
 
 		/* Point to element */

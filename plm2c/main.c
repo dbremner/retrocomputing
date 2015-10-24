@@ -80,8 +80,6 @@ cvt_file(char *file_name)
 	int		tmp_line_count;
 	char		tmp_file_name[128];
 
-	char		*get_mem();
-
 		/* Is this the first file? */
 	if (file_depth) {
 			/* No - save old text pointers */
