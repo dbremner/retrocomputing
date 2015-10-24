@@ -1,3 +1,4 @@
+#pragma once
 /*
  *	Parse LITERALLY declared strings
  */

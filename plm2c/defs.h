@@ -1,3 +1,4 @@
+#pragma once
 /*
  *	Maximum number of characters in a token
  */

@@ -1,3 +1,4 @@
+#pragma once
 /*
  *	PL/M Cast function equivalents
  */

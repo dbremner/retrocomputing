@@ -1,3 +1,4 @@
+#pragma once
 /*
  *	Format of a token returned by get_token().
  */
