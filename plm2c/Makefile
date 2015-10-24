@@ -32,7 +32,7 @@ TEST = test.plm test.c.out
 DOCS = README CAVEATS.DOC
 SRCS = $(DOCS) FILES Makefile $(CSRCS) $(TOKEN_HDRS) $(TEST) makefile.ibm
 
-OPTS = -c -O
+OPTS = -c -O -Wall -Wextra -Wold-style-definition -Wstrict-prototypes -std=c99
 
 plm2c:	$(OBJS)
 	$(CC) -o plm2c $(OBJS)
