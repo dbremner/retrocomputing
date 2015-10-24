@@ -25,9 +25,8 @@ extern	TOKEN	literal_token;
  *	If out_string is not NULL, append string to out_string.
  *	Otherwise write string to stdout.
  */
-out_data(string, length)
-char	*string;
-int	length;
+void
+out_data(char *string, int length)
 {
 	if (length) {
 		if (out_string)
@@ -50,8 +49,8 @@ int	length;
 /*
  *	Print white space
  */
-out_white_space(token)
-TOKEN	*token;
+void
+out_white_space(TOKEN *token)
 {
 	int	length;
 
@@ -66,8 +65,8 @@ TOKEN	*token;
  *	Print white space, if any.  If start of white space string is not
  *	white, prefix with a space.
  */
-out_must_white(token)
-TOKEN	*token;
+void
+out_must_white(TOKEN *token)
 {
 	if (!is_white(*(token->white_space_start)))
 		out_char(' ');
@@ -78,8 +77,8 @@ TOKEN	*token;
  *	Print all white space up first new-line (if any).
  *	Move white_space_start to point past first new-line.
  */
-out_pre_line(token)
-TOKEN	*token;
+void
+out_pre_line(TOKEN *token)
 {
 	while ((token->white_space_start < token->white_space_end) &&
 		(*token->white_space_start != '\n')) {
@@ -92,8 +91,8 @@ TOKEN	*token;
  *	Print all white space up to but not including last new-line.
  *	Move white_space_start to point to last new-line.
  */
-out_pre_white(token)
-TOKEN	*token;
+void
+out_pre_white(TOKEN *token)
 {
 	char	*ptr;
 	int	length;
@@ -117,8 +116,8 @@ TOKEN	*token;
 /*
  *	Output token name
  */
-out_token_name(token)
-TOKEN	*token;
+void
+out_token_name(TOKEN *token)
 {
 	if (is_a_type(token))
 		out_type(token->token_type);
@@ -129,8 +128,8 @@ TOKEN	*token;
 /*
  *	Output white space and token name
  */
-out_token(token)
-TOKEN	*token;
+void
+out_token(TOKEN *token)
 {
 	out_white_space(token);
 	out_token_name(token);
@@ -139,8 +138,8 @@ TOKEN	*token;
 /*
  *	Output guaranteed white space and token name
  */
-out_must_token(token)
-TOKEN	*token;
+void
+out_must_token(TOKEN *token)
 {
 	out_must_white(token);
 	out_token_name(token);
@@ -149,8 +148,8 @@ TOKEN	*token;
 /*
  *	Output case converted token name
  */
-out_cvt_name(token)
-TOKEN	*token;
+void
+out_cvt_name(TOKEN *token)
 {
 	char	*ptr;
 
@@ -168,8 +167,8 @@ TOKEN	*token;
 /*
  *	Output string
  */
-out_str(string)
-char	*string;
+void
+out_str(char *string)
 {
 	out_data(string, strlen(string));
 }
@@ -177,8 +176,8 @@ char	*string;
 /*
  *	Output character
  */
-out_char(ch)
-char	ch;
+void
+out_char(char ch)
 {
 	out_data(&ch, 1);
 }
@@ -186,7 +185,8 @@ char	ch;
 /*
  *	Output new-line if not at start of line
  */
-out_to_start()
+void
+out_to_start(void)
 {
 	if (last_out_ch != LF)
 		out_char(LF);
@@ -195,8 +195,8 @@ out_to_start()
 /*
  *	Output type
  */
-out_type(type)
-int	type;
+void
+out_type(int type)
 {
 	switch (type) {
 
@@ -252,7 +252,8 @@ int	type;
 /*
  *	Initialize variables for I/O.
  */
-out_init()
+void
+out_init(void)
 {
 	out_string = NULL;
 	last_out_ch = '\0';
@@ -264,9 +265,8 @@ out_init()
  *		'W' << 24 | 'X' << 16 | 'Y' << 8 | Z
  *	where len specifies the number of bytes in the string to output.
  */
-out_str_const(str_ptr, len)
-char	*str_ptr;
-int	len;
+void
+out_str_const(char *str_ptr, int len)
 {
 	while (len-- && *str_ptr) {
 		out_char('\'');
@@ -287,9 +287,8 @@ int	len;
 /*
  *	Convert NUMERIC constant to octal constant
  */
-cvt_octal(token, octal_string)
-TOKEN	*token;
-char	octal_string[];
+void
+cvt_octal(TOKEN *token, char octal_string[])
 {
 	int	octal;
 	char	ch, *ptr;
