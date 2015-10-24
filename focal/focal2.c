@@ -80,11 +80,7 @@ void library(void)
 		break;
 
 	case 'd':
-#ifdef	vax
-		if (delete(p) < 0)
-#else
 		if (remove(p) < 0)
-#endif
 			diag("Cannot delete");
 		break;
 

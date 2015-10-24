@@ -13,7 +13,7 @@
 	$(ATOD)		= 1
 	$(DTOA)		= 1
 */
-#ifdef	DOCUMENTATION
+/*
 
 title	focal		Ancient Interpretive Language
 index			Ancient Interpretive Language
@@ -28,27 +28,19 @@ description
 	It is described in the PDP-8 "Introduction to Programming."
     There is also a PDP-11 Focal manual.
 
-	This version of focal runs on Vax/VMS and Unix.
+	This version of focal runs on Unix.
 
 author
 
 	Dave Conroy
 
-#endif
-
+*/
 #include	"focal.h"
-#ifdef	vms
-#include	<stsdef.h>
-#include	<ssdef.h>
-#define	IO_SUCCESS	SS$_NORMAL
-#define	IO_ERROR	(STS$M_INHIB_MSG | SS$_ABORT)
-#else
 #ifndef	IO_SUCCESS
 #define	IO_SUCCESS	0
 #endif
 #ifndef	IO_ERROR
 #define	IO_ERROR	1
-#endif
 #endif
 
 char	cbuf[128];			/* Command buffer */
