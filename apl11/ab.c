@@ -203,7 +203,7 @@ map1(o)
 	struct item *p;
 
 	p = sp[-2];
-	p->index = access() + o;
+	p->index = access_() + o;
 	putdat(sp[-1], getdat(p));
 }
 
@@ -224,7 +224,7 @@ int *fill;
 	for(i=0; i<idx.rank; i++) {
 		if (fill[i] > 0 && idx.idx[i] >= fill[i] || fill[i] < 0 && idx.idx[i] < -fill[i]){
 			p = sp[-1];
-			p->index = access();
+			p->index = access_();
 			putdat(p, (p->type==DA) ? zero : (data)' ');
 			return;
 		}

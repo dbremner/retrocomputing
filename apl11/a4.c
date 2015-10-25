@@ -150,7 +150,7 @@ index1(i, f)
 
 		case 0:
 			p = sp[-2];
-			p->index = access();
+			p->index = access_();
 			putdat(sp[-1], getdat(p));
 			return;
 
@@ -159,7 +159,7 @@ index1(i, f)
 
 		case 2:
 			p = ((struct nlist *)sp[-2])->itemp;
-			p->index = access();
+			p->index = access_();
 			putdat(p, datum);
 			return;
 		}

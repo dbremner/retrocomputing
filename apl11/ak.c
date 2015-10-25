@@ -75,7 +75,7 @@ data *param[];
 
 	f = (data (*)())param[1];
 	for (i=0; i<idx.dimk; i++) {
-		dp = param[0] + access() + (idx.dimk - (i+1)) * idx.delk;
+		dp = param[0] + access_() + (idx.dimk - (i+1)) * idx.delk;
 		ip = dp;
 		d  = *ip;
 		for (j=1; j<idx.dimk-i; j++) {

@@ -58,7 +58,7 @@ rot1(param)
 	q = sp[-1];
 	p = sp[-3];
 	q->index = 0;
-	n = access();
+	n = access_();
 	for(i=0; i<idx.dimk; i++) {
 		p->index = n + (o%idx.dimk)*idx.delk;
 		putdat(q, getdat(p));

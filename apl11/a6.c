@@ -84,7 +84,7 @@ int param[];
 	data *dp, d, (*f)();
 
 	dp = param[0];
-	dp += access() + (idx.dimk-1) * idx.delk;
+	dp += access_() + (idx.dimk-1) * idx.delk;
 	f = (data (*)())param[2];
 	d = *dp;
 	for(i=1; i<idx.dimk; i++) {

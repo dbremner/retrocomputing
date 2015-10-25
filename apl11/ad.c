@@ -94,7 +94,7 @@ com1(k)
 	p->index = idx.idx[k];
 	if(getdat(p)) {
 		p = sp[-3];
-		p->index = access();
+		p->index = access_();
 		putdat(sp[-1], getdat(p));
 	}
 }

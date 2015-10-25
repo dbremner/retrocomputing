@@ -47,7 +47,7 @@ struct item *param[];
 	int i, n;
 
 	p = param[0];
-	n = access();
+	n = access_();
 	for(i=0; i<idx.dimk; i++) {
 		p->index = n;
 		putdat(param[1], getdat(p));

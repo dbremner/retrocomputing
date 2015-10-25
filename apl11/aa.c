@@ -66,7 +66,7 @@ int *param[];
 	struct item *p;
 	int i, *m;
 
-	integ = access();
+	integ = access_();
 	m = param[0];
 	for(i=0; i<idx.dimk; i++) *m++ = i;
 	m = param[0];
