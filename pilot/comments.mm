@@ -2,7 +2,7 @@
 .\" 
 .SA 1
 .TL
-Implementor's Comments on the IEE PILOT Standard
+Implementor's Comments on the IEEE PILOT Standard
 .AF "Thyrsus Enterprises"
 .AU "Eric S. Raymond" ESR "\&\&22 South Warren Ave, Malvern PA 19355"
 .MT 4
