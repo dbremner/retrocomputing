@@ -11,8 +11,6 @@
 !                                                                       !
 \*---------------------------------the-mad-programmer-strikes-again----*/
 
-#define UNIX
-
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -31,8 +29,7 @@
 
 FILE *inf, *outf;
 
-int labelcount = 0,
-    linecount  = 0,
+int linecount  = 0,
     debug      = 0;
 
 char token[MAXTOKEN],
@@ -222,13 +219,6 @@ int string(char *name) {
   enter(name,token);
   gettoken();
   return 1;
-}
-
-void label(char *name) {
-  char result[6];
-  d("label ",name,"");
-  sprintf(result,"L%d",labelcount++);
-  enter(name,result);
 }
 
 /* Internal symbol table */

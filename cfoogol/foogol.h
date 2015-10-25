@@ -38,7 +38,6 @@ int match(char *s);
 int id(char *name);
 int number(char *name);
 int string(char *name);
-void label(char *name);
 void enter(char *key,char *val);
 int lookup(char *key);
 void Remove(char *key);
