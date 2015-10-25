@@ -21,7 +21,7 @@ struct	line
 	struct	line	*l_fp;		/* Link */
 	char	l_lno;			/* Line */
 	char	l_gno;			/* Group */
-	char	l_text[1];		/* Text */
+	char	*l_text;		/* Text */
 };
 
 struct	lno
@@ -62,7 +62,7 @@ struct	sym
 		double	s_value;	/* The data */
 		double	(*s_fp)(double);	/* Function pointer */
 	} s_un;
-	char	s_id[1];			/* Name */
+	char	*s_id;			/* Name */
 };
 
 #define	S_SCAL	0			/* Scalar */

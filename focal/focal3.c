@@ -99,10 +99,21 @@ alocline(const char *cp)
 {
 	struct line *lp = NULL;
 
-	lp = (struct line *) malloc(sizeof(*lp)+strlen(cp)+1);
+	lp = (struct line *) calloc(sizeof(*lp),1);
 	if (lp == NULL)
 		diag("Out of memory");
+    lp->l_text=strdup(cp);
+    if (lp->l_text == NULL)
+		diag("Out of memory");
 	return (lp);
+}
+
+void
+freeline(struct line *lp)
+{
+    if(lp)  //this case should not occur
+        free(lp->l_text);
+    free(lp);
 }
 
 /*

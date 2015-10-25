@@ -107,7 +107,7 @@ void builtin(const char *cp, double (*fp)(double))
 	struct sym *sp = NULL;
 	int	ix;
 	
-	sp = (struct sym *)malloc(sizeof(*sp)+strlen(cp)+1);
+	sp = allocsym(cp);
 	if (sp == NULL) {
 		fprintf(stderr, "No memory for %s\n", cp);
 		exit(IO_ERROR);
@@ -118,7 +118,6 @@ void builtin(const char *cp, double (*fp)(double))
 	sp->s_type = S_FUNC;
 	sp->s_subs = 0;
 	sp->s_un.s_fp = fp;
-	strcpy(sp->s_id, cp);
 }
 
 
@@ -262,7 +261,7 @@ loop:
 				if (lp1 == NULL)
 					line = lp2; else
 					lp1->l_fp = lp2;
-				free((char *) lp3);
+				freeline(lp3);
 			} else {
 				lp1 = lp2;
 				lp2 = lp2->l_fp;
@@ -456,7 +455,7 @@ newcontrol(void)
 		cp = ccb_free;
 		ccb_free = cp->c_fp;
 	} else if ((cp = (struct control *)
-		     malloc(sizeof(struct control))) == NULL) {
+		     calloc(sizeof(struct control), 1)) == NULL) {
 		diag("Out of space (control stack)");
 	}
 	return cp;
@@ -614,7 +613,7 @@ void inject(int c)
 				line = lp2;
 			else
 				lp1->l_fp = lp2;
-			free((char *) lp3);
+			freeline(lp3);
 			break;
 		}
 		lp1 = lp2;
@@ -749,7 +748,7 @@ void erasesyms()
 		sym[i] = NULL;
 		while (sp1 != NULL) {
 			sp2 = sp1->s_fp;
-			free((char *) sp1);
+			freesym(sp1);
 			sp1 = sp2;
 		}
 	}

@@ -160,6 +160,27 @@ lookup(const char *id, int type, int subs)
 }
 
 struct sym *
+allocsym(const char *id)
+{
+    struct sym *sp = calloc(sizeof(*sp),1);
+    if(sp) {
+        sp->s_id = strdup(id);
+        if(!sp->s_id) {
+            free(sp);
+        }
+    }
+    return sp;    
+}
+
+void
+freesym(struct sym *s)
+{
+    if(s) //this case shouldn't occur
+        free(s->s_id);
+    free(s);
+}
+
+struct sym *
 getsym(void)
 {
 	int c;
@@ -189,7 +210,7 @@ getsym(void)
 	} else
 		--ctp;
 	if ((sp=lookup(id, type, subs)) == NULL) {
-		sp = (struct sym *)malloc(sizeof(*sp)+strlen(id)+1);
+		sp = allocsym(id);
 		if (sp == NULL)
 			diag("Out of space (symbols)");
 		ix = hashsym(id, type, subs);
@@ -197,7 +218,6 @@ getsym(void)
 		sym[ix] = sp;
 		sp->s_type = type;
 		sp->s_subs = subs;
-		strcpy(sp->s_id, id);
 	}
 	return (sp);
 }

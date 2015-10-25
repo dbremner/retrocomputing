@@ -62,7 +62,7 @@ void library(void)
 		lp1 = line;
 		while (lp1 != NULL) {
 			lp2 = lp1->l_fp;
-			free ((char *) lp1);
+			freeline(lp1);
 			lp1 = lp2;
 		}
 		line = NULL;

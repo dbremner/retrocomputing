@@ -17,6 +17,8 @@ void	erasesyms (void);
 double	eval (void);
 double	primary (void);
 double	term (void);
+struct sym	*allocsym(const char *cp);
+void freesym(struct sym *s);
 struct sym	*lookup (const char *id, int type, int subs);
 struct sym	*getsym (void);
 
@@ -38,6 +40,7 @@ void	putline (const struct line *lp, FILE *fp);
 void	getlno (struct lno *lnop, int c);
 int	getnum (int c);
 struct line	*alocline (const char *cp);
+void freeline(struct line *lp);
 void	diag (const char *s);
 int	getnb (void);
 double	drand48 (void);
