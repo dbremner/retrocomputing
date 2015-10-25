@@ -289,6 +289,7 @@ fitr(double arg)
 double
 fran(double arg)
 {
-	return (drand48());
+	(void)arg;
+    return (drand48());
 }
 
