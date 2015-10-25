@@ -101,7 +101,7 @@ void error2(char *s1,char *s2) {
 
 void lowcase(char *s) {
   char c;
-  for (c = *s; c = *s; ++s) if (isupper(c)) *s = tolower(c);
+  for (c = *s; c = *s; ++s) *s = tolower(c);
 }
 
 /* Basic I/O functions */
