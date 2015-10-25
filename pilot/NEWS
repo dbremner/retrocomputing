@@ -1,0 +1,46 @@
+				TO DO
+
+1. Full dynamic-memory management; no more fixed string-length limits.
+
+2. File handling.  There's no standard FILE syntax, but there are some
+   conventions common in existing versions.
+
+3. Interpreter support for X (Execute)?  Not hard to con the lexer
+   into taking characters from a string, but we'd have to go to Bison or
+   some other method that generates re-entrant parsers.
+
+			RELEASE NEWS
+
+Version 1.8 (Mon Oct 7 1996)
+	In pedantic mode, cough and die on nonstandard constructs instead
+	of trying to recover.  Recovery wouldn't have worked anyway and
+	this made the parser much faster.
+
+Version 1.7 (Fri Sep 16 1994):
+	Fixed core-dump bug by making the input text buffer larger.
+
+Version 1.6 (Wed Sep 14 1994)
+	ANSI-ized the code; no more -DBSD or -DATT
+	Fixed bug in compiler label generation.
+	Fixes in tutorial.
+	Fixed processing of in-line comment syntax.
+
+Version 1.5 (Sun Nov 7 1993):
+	Cleanup for PTF release.
+
+Version 1.4 (Thu May 28 1992):
+	Numerous minor documentation fixes.
+	Tour document added.
+
+Version 1.3 (Tue May 19 1992):
+	CA,CL,CE support, with optional device-independent I/O via termcap(3).
+	Enhancements and minor fixes to tutorial.
+	JM is implemented.
+	The PROBLEM abbreviation is now PR as in Nevada PILOT.
+
+Version 1.2:
+	WAIT keyword changed to PAUSE.
+	Added stdconv utility.
+
+Version 1.1:
+	Initial release.

@@ -1,0 +1,86 @@
+This is the READ.ME file for the reference implementation of IEEE PILOT
+by Eric S. Raymond <esr@snark.thyrsus.com>, version 1.8, October
+1996.  It includes a file manifest, portability notes, a disclaimer,
+and a to-do list.
+
+UNIX versions of the distribution consist of the following files:
+
+READ.ME		--- this file
+NEWS		--- release notes and to-do list
+pilot.1		--- nroff(1) source of the man page
+stdconv.1	--- manual page for the stdconv utility
+comments.mm	--- Implementor's Comments on the IEE PILOT Standard
+tour.mm		--- tour guide to the PILOT internals
+tutor.p		--- interactive PILOT tutor written in PILOT
+Makefile	--- UNIX makefile for the system
+pilot.h		--- types and #defines
+pilot.y		--- yacc(1) grammar for the interpreter
+pilot.l		--- lex(1) lexical analyzer for the language
+gencode.c	--- interpreter, compiler and storage management
+gencode.h	--- interpreter, compiler and storage management interface 
+nonstd.c	--- action functions & code for non-core stuff
+rpilot.c	--- basic runtime-support variables for compiler library
+plib.c		--- FILE & GRAPHIC handling for compiler library
+match.c		--- match handling for compiler library
+numconv.c	--- string-to-numeric conversion for compiler library
+stdconv.l	--- convert PILOT from existing dialects to IEEE standard.
+
+The following generated files are included with the distribution.  If you
+have stock AT&T lex and yacc, or BSD blex and byacc, you can safely
+modify the .y and .l files and regenerate these.
+
+tokens.h	--- YACC-generated terminal symbol values
+lexer.c		--- C code for lexical analyzer
+grammar.c	--- C code for parser
+
+Non-UNIX versions will add the following (generated) files:
+
+pilot.man	--- formatted version of PILOT man page
+stdconv.man	--- formatted version of converter man page
+comments.lp	--- formatted version of Implementor's Comments
+tour.lp		--- formatted version of Tour Guide
+y.output	--- grammar action description, useful with -v option
+stdconv.c	--- C code for converter
+
+The following sample PILOT programs are included:
+
+tutor.p		--- interactive tutorial on PILOT
+story.p		--- program to generate a silly story from user input
+tea.p		--- teaches the art of tea-brewing
+speaknum.p	--- translate numbers to English
+goldilocks.p	--- another silly-story program, more interactive
+
+It will be helpful to have handy a copy of the IEEE Standard for
+Programmed Inquiry, Learning, Or Teaching (PILOT).  This is IEEE Std
+1154-1991, ISBN 1-55937-151-X.  Be sure you also get the two loose
+pages of corrections.
+
+The distribution includes an interactive tutorial program written in
+PILOT that will help you learn PILOT.  It is tutor.p; to run it, make
+pilot and run `pilot tutor'.
+
+For help on porting this PILOT implementation to other environments, see
+"A Brief Tour of the PILOT Internals", included with this distribution.
+
+			AUTHOR'S DISCLAIMER
+
+Don't blame me for the language design; I think it's wretched, too,
+and I only did this implementation for the hack value.  Finally, a
+*real* language that's as perverse and limiting as INTERCAL...
+
+No warranty express or implied, etc, etc.  It runs and compiles the
+conforming examples the IEE 1154 working group sent me and the
+tutorial I wrote for it.  That's all.
+
+			TO DO
+
+I can't see anyone but the ex-perpetrator of C-INTERCAL being willing to
+spend good hacking time on this turkey.  Nevertheless, there's a to-do
+list in the file NEWS for anyone afflicted with fits of temporary lunacy as
+severe as mine.  You might find an update from my WWW home page,
+http://www.ccil.org/~esr/home.html.
+
+Have fun with this, or something...
+						ESR
+					from the console of `snark'
+					very early on a November morning...
