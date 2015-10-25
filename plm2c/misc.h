@@ -69,6 +69,7 @@ void parse_file(void);
 void element_copy(DECL_MEMBER *src, DECL_MEMBER *dest);
 void parse_declare(TOKEN *first_token);
 int parse_type(DECL_MEMBER *el_ptr, TOKEN *token);
+void get_decl_list(DECL *decl);
 
 //declout.c
 void out_pointer(TOKEN *name, BOOLEAN use_parens);

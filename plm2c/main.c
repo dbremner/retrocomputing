@@ -239,4 +239,5 @@ main(int argc, char **argv)
 
 		/* Parse main file */
 	cvt_file(argv[1]);
+    return 0; //FIXME not reached?
 }
