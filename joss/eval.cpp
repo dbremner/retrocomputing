@@ -176,12 +176,12 @@ eval( expr *s, double *x_result, int *i_result)
       v = find_var( s->value.i);
       if (v->type == (-1))
       {
-         sprintf( message, "Formula %c is not defined.", v->name);
+         snprintf( message,  sizeof(message), "Formula %c is not defined.", v->name);
          EVALERROR( message)
       }
       if (v->type != 3)
       {
-         sprintf( message, "%c is not a formula.", v->name);
+         snprintf( message,  sizeof(message), "%c is not a formula.", v->name);
          EVALERROR( message)
       }
 
@@ -329,7 +329,7 @@ eval( expr *s, double *x_result, int *i_result)
             v = find_var( p->value.i);
             if (v->type != 3)
             {
-               sprintf( message, "%c is not a formula.", v->name);
+               snprintf( message,  sizeof(message), "%c is not a formula.", v->name);
                EVALERROR( message)
             }
             v->clear();
@@ -368,7 +368,7 @@ eval( expr *s, double *x_result, int *i_result)
          }
          else
          {
-            sprintf( message, "Cannot delete %s.", p->symbol.c_str());
+            snprintf( message,  sizeof(message), "Cannot delete %s.", p->symbol.c_str());
             EVALERROR( message)
          }
       }
@@ -467,7 +467,7 @@ eval( expr *s, double *x_result, int *i_result)
       pc1 = S.get( i);
       if (pc1 == nullptr)
       {
-         sprintf( message, "Cannot do step %-.3f -- undefined.", (float) x);
+         snprintf( message,  sizeof(message), "Cannot do step %-.3f -- undefined.", (float) x);
          EVALERROR( message)
       }
       pc = pc1;
@@ -883,7 +883,7 @@ eval( expr *s, double *x_result, int *i_result)
             v = find_var( p->value.i);
             if (v->type != 3)
             {
-               sprintf( message, "%c is not a formula.", v->name);
+               snprintf( message, sizeof(message), "%c is not a formula.", v->name);
                EVALERROR( message)
             }
             v->display();
@@ -971,7 +971,7 @@ eval( expr *s, double *x_result, int *i_result)
       form_number = int (x + 0.5);
       if (form_number < 1 || form_number > MAX_NUM_FORMS)
       {
-         sprintf( message,
+         snprintf( message, sizeof(message),
            "Bad form number %d -- must be between 1 and %d.", form_number,
            MAX_NUM_FORMS);
          EVALERROR( message)
@@ -979,7 +979,7 @@ eval( expr *s, double *x_result, int *i_result)
 
       if (!F.defined( form_number))
       {
-         sprintf( message, "Form %d is not defined.", form_number);
+         snprintf( message, sizeof(message), "Form %d is not defined.", form_number);
          EVALERROR( message)
       }
 
@@ -1069,7 +1069,7 @@ eval( expr *s, double *x_result, int *i_result)
 
    else
    {
-      sprintf( message, "Cannot recognize token: %s.\n", s->symbol.c_str());
+      snprintf( message, sizeof(message), "Cannot recognize token: %s.\n", s->symbol.c_str());
       EVALERROR( message)
    }
 }

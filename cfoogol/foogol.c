@@ -95,7 +95,7 @@ void error(char *msg) {
 
 void error2(char *s1,char *s2) {
   static char msg[80];
-  sprintf(msg,"%s\"%s\"",s1,s2);
+  snprintf(msg,sizeof(msg),"%s\"%s\"",s1,s2);
   error(msg);
 }
 

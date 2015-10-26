@@ -307,14 +307,14 @@ parse( int goal, expr *s)
 
             if (s->next == p)
             {
-               sprintf( message, "Statement cannot start with %s.\n",
+               snprintf( message,  sizeof(message), "Statement cannot start with %s.\n",
                         p->symbol.c_str());
                PERROR( p, message)
             }
 
             if (p->next == s)
             {
-               sprintf( message, "Incomplete %s statement.", p->symbol.c_str());
+               snprintf( message,  sizeof(message), "Incomplete %s statement.", p->symbol.c_str());
                PERROR( p, "Incomplete if, for, or while statement.")
             }
 
@@ -1410,7 +1410,7 @@ parse_error( int pos, const char *message)
    }
    else
    {
-      sprintf( line, "     %-.3f  ", ((float) step_number) / 1000.0);
+      snprintf( line, sizeof(line), "     %-.3f  ", ((float) step_number) / 1000.0);
 
       n = strlen( line) + pos;
       printf( "%s%s\n", line, cur_line);

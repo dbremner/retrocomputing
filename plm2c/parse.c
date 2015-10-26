@@ -871,7 +871,7 @@ parse_do(TOKEN *first_token)
 				case_output[0] = '\0';
 				out_string = case_output;
 	
-				(void) sprintf(case_statement, "case %d :",
+				(void) snprintf(case_statement, sizeof(case_statement), "case %d :",
 					case_line++);
 				token_class = parse_new_statement();
 				if (token_class == END_OF_FILE) {

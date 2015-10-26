@@ -339,7 +339,7 @@ step::display()
    int len;
    char *s;
 
-   sprintf( step_string, "%-.3f", ((float) step_number) / 1000.0);
+   snprintf( step_string, sizeof(step_string), "%-.3f", ((float) step_number) / 1000.0);
    len = strlen( step_string);
 
    s = &step_string[len-1];
@@ -525,7 +525,7 @@ vars::get_value( double *x_result, char *prompt)
    {
       if (prompt == nullptr)
       {
-         sprintf( line, "     %c = ", name);
+         snprintf( line, sizeof(line), "     %c = ", name);
          prompt = line;
       }
       if (!demand( prompt, x_result)) return 0;
@@ -595,9 +595,9 @@ vars::find_element( int j1, int j2, int demand_switch, char *prompt)
       if (prompt == nullptr)
       {
          if (type == 1)
-            sprintf( line, "     %c[%d] = ", name, j1);
+            snprintf( line, sizeof(line), "     %c[%d] = ", name, j1);
          else
-            sprintf( line, "     %c[%d,%d] = ", name, j1, j2);
+            snprintf( line, sizeof(line), "     %c[%d,%d] = ", name, j1, j2);
          prompt = line;
       }
 

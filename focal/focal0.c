@@ -671,7 +671,7 @@ static	int ifmtb = 1;
 			if (getnb() != '.')
 				diag("Missing . in format");
 			y = getnum(getnb());
-			sprintf(fmtb, "%%%d.%df", x, y);
+			snprintf(fmtb, sizeof(fmtb), "%%%d.%df", x, y);
 			fmt = fmtb;
 			continue;
 		}

@@ -240,7 +240,7 @@ out_decl_member(DECL_MEMBER *decl_list, TOKEN *decl_token)
 
 			    out_str(decl_list->at_ptr);
 			    if (name_count) {
-				(void) sprintf(count_str, " + %d", name_count);
+				(void) snprintf(count_str, sizeof(count_str), " + %d", name_count);
 				out_str(count_str);
 			    }
 			}
