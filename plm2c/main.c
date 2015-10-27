@@ -224,9 +224,7 @@ main(int argc, char **argv)
 		i = strlen(argv[1]);
 
 		/* Append a '.c' */
-	(void) strncpy(out_file_name, argv[1], i);
-	out_file_name[i] = '\0';
-	(void) strcat(out_file_name, ".c");
+	snprintf(out_file_name, sizeof(out_file_name), "%s.c", argv[1]);
 	(void) printf("Output to: %s\n", out_file_name);
 
 		/* Get AT declaration list */
