@@ -58,7 +58,7 @@ int	intflag;			/* Interrupt flag */
 
 struct	sym	*sym[N_HASH + 1];	/* Symbol table */
 
-int main()
+int main(void)
 {
 	int	c;
 
@@ -738,7 +738,7 @@ void save(struct lno *lnop, FILE *fp)
 	}
 }
 
-void erasesyms()
+void erasesyms(void)
 {
 	struct sym *sp1, *sp2;
 	int	i;
