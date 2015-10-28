@@ -27,12 +27,12 @@
 #define SEMICOLON   4
 #define RANDOM      5
 
-FILE *inf, *outf;
+static FILE *inf, *outf;
 
-int linecount  = 0,
+static int linecount  = 0,
     debug      = 0;
 
-char token[MAXTOKEN],
+static char token[MAXTOKEN],
      pending[MAXTOKEN],
      keytab[MAXTAB][MAXTOKEN],
      symtab[MAXTAB][MAXTOKEN],
@@ -101,7 +101,7 @@ void error2(char *s1,char *s2) {
 
 void lowcase(char *s) {
   char c;
-  for (c = *s; c = *s; ++s) if (isupper(c)) *s = tolower(c);
+  for (; c = *s; ++s) if (isupper(c)) *s = tolower(c);
 }
 
 /* Basic I/O functions */

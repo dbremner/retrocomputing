@@ -1,8 +1,10 @@
 # Makefile for foogol
 #
 
-CC = gcc
-CFLAGS	= -O -g -Wall -Wextra -pedantic -Wstrict-prototypes -Wold-style-definition -std=c99
+#CC = gcc
+CC = clang
+CFLAGS	= -O -g -Weverything -std=c99
+#CFLAGS	= -O -g -Wall -Wextra -pedantic -Wstrict-prototypes -Wold-style-definition -std=c99
 
 OBJECTS	= \
 	foogol.o
