@@ -89,9 +89,7 @@ tree_print( int level, expr *e)
 void
 init_vars()
 {
-   int i;
-
-   for (i=0; i<26; i++)
+   for (int i=0; i<26; i++)
    {
       V[i].init( 'a' + i);
       V[i+26].init( 'A' + i);

@@ -171,16 +171,14 @@ forms::display( int i)
 void
 forms::init()
 {
-   int i;
-
-   for (i=0; i<MAX_NUM_FORMS; i++)
+   for (int i=0; i<MAX_NUM_FORMS; i++)
    {
       f[i].num_args = 0;
       f[i].oldf[0] = '\0';
       f[i].newf[0] = '\0';
    }
 
-   for (i=0; i<MAX_NUM_VARS_IN_FORMS; i++)
+   for (int i=0; i<MAX_NUM_VARS_IN_FORMS; i++)
       x_vars[i] = 0.0;
 
    num_vars = 0;
@@ -199,13 +197,11 @@ forms::remove( int i)
 void
 forms::set( int i, char *fs)
 {
-   char *s, *t;
-
    f[i-1].num_args = 0;
    strcpy( f[i-1].oldf, fs);
-   s = f[i-1].newf;
+   char *s = f[i-1].newf;
 
-   for (t = fs; *t != '\0'; t++)
+   for (char *t = fs; *t != '\0'; t++)
    {
       if (*t == '\\')
       {
@@ -336,13 +332,11 @@ void
 step::display()
 {
    static char step_string[20];
-   int len;
-   char *s;
 
    snprintf( step_string, sizeof(step_string), "%-.3f", ((float) step_number) / 1000.0);
-   len = strlen( step_string);
+   int len = strlen( step_string);
 
-   s = &step_string[len-1];
+   char *s = &step_string[len-1];
    while (*s == '0') *s-- = ' ';
 
    printf( "     %s %s\n", step_string, line);
@@ -376,8 +370,7 @@ step::set( int number, char *t, expr *f)
 void
 steps::init()
 {
-   int i;
-   for (i=0; i<MAX_NUM_STEPS; i++)
+   for (int i=0; i<MAX_NUM_STEPS; i++)
    {
       st[i].set( 0, nullptr, nullptr);
    }
@@ -388,7 +381,7 @@ steps::init()
 void
 steps::insert( int step_number, char *s, expr *e)
 {
-   int i, j;
+   int i;
 
    for (i=0; i<num_steps; i++)
       if (st[i].step_number >= step_number) break;
@@ -405,7 +398,7 @@ steps::insert( int step_number, char *s, expr *e)
          exit(0);
       }
 
-      for (j = num_steps-1; j >= i; j--)
+      for (int j = num_steps-1; j >= i; j--)
          st[j+1].move( &st[j]);
 
       num_steps++;
@@ -417,14 +410,12 @@ steps::insert( int step_number, char *s, expr *e)
 step *
 steps::remove( step *s)
 {
-   int i, j;
-
-   j = s - st;
+   int j = s - st;
    if (j < 0 || j >= num_steps) return nullptr;
 
    st[j].clear();
 
-   for (i = j+1; i<num_steps; i++)
+   for (int i = j+1; i<num_steps; i++)
       st[i-1].move( &st[i]);
 
    num_steps--;
@@ -437,9 +428,7 @@ steps::remove( step *s)
 void
 steps::remove_all()
 {
-   int i;
-
-   for (i=0; i<num_steps; i++) st[i].clear();
+   for (int i=0; i<num_steps; i++) st[i].clear();
    num_steps = 0;
 }
 
@@ -447,8 +436,7 @@ steps::remove_all()
 step *
 steps::get( int step_number)
 {
-   int i;
-   for (i=0; i<num_steps; i++)
+   for (int i=0; i<num_steps; i++)
    {
       if (st[i].step_number < step_number) continue;
       if (st[i].step_number > step_number) break;
@@ -461,8 +449,7 @@ steps::get( int step_number)
 step *
 steps::get_next( int step_number)
 {
-   int i;
-   for (i=0; i<num_steps; i++)
+   for (int i=0; i<num_steps; i++)
    {
       if (st[i].step_number > step_number) return &st[i];
    }
@@ -473,9 +460,7 @@ steps::get_next( int step_number)
 step *
 steps::next( step *s)
 {
-   int i;
-
-   i = s - st;
+   int i = s - st;
    if (i<0 || i >= num_steps-1)
       return nullptr;
    return &st[i+1];
@@ -565,7 +550,6 @@ vars::find_element( int j1, int j2, int demand_switch, char *prompt)
    element *t, *u, *v;
    double x;
    static char line[LINE_LEN];
-   int new_element;
 
    /*
     *  demand_switch = 0:   Find the element entry, and create
@@ -576,7 +560,7 @@ vars::find_element( int j1, int j2, int demand_switch, char *prompt)
     *                       it is new or not.
     */
 
-   new_element = 1;
+   int new_element = 1;
    for (v = e_list, t = nullptr;
         v != nullptr;
         t = v, v = v->next)
@@ -653,7 +637,6 @@ vars::clear()
 void
 vars::display()
 {
-   element *e;
    switch( type)
    {
       case -1:
@@ -665,14 +648,14 @@ vars::display()
          break;
 
       case 1:
-         for (e = e_list; e != nullptr; e = e->next)
+         for (element *e = e_list; e != nullptr; e = e->next)
          {
             printf( "     %c[%d] = %lg\n", name, e->i1, e->value);
          }
          break;
 
       case 2:
-         for (e = e_list; e != nullptr; e = e->next)
+         for (element *e = e_list; e != nullptr; e = e->next)
          {
             printf( "     %c[%d,%d] = %lg\n", name, e->i1, e->i2,
                     e->value);
@@ -693,8 +676,6 @@ vars::display()
 void
 delete_exp( expr *e)
 {
-   expr *f;
-
    if (e == nullptr) return;
 
    while (!e->hd()) e = e->back;
@@ -702,6 +683,7 @@ delete_exp( expr *e)
    e->back->next = nullptr;
    e->back = nullptr;
 
+   expr *f;
    for (f = e; f != nullptr; f = f->next)
    {
       if (f->down != nullptr)
@@ -730,11 +712,9 @@ delete_exp( expr *e)
 int
 demand( char *prompt, double *x)
 {
-   char *t;
-
    if (!read_line( prompt)) exit(0);
 
-   t = input_line;
+   char *t = input_line;
    while (*t == ' ') t++;
    if (strncmp( t, "Stop", 4) == 0 ||
        strncmp( t, "Cancel", 6) == 0) return 0;
@@ -762,8 +742,6 @@ find_var( int name)
 void
 join( expr *e1, expr *e2)
 {
-   expr *f1, *f2;
-
    if (e2 == nullptr) return;
 
    if (e1 == nullptr || !e1->hd() || !e2->hd())
@@ -771,8 +749,8 @@ join( expr *e1, expr *e2)
 
    if (e2->next == e2) return;
 
-   f1 = e1->back;
-   f2 = e2->back;
+   expr *f1 = e1->back;
+   expr *f2 = e2->back;
    f1->next = e2->next;
    e2->next->back = f1;
    f2->next = e1;
@@ -835,13 +813,12 @@ short_display( expr *e, char *s)
 expr *
 split( expr *q)
 {
-   expr *head, *new_head, *p, *r;
-
-   p = q->back;
+   expr *p = q->back;
+   expr *head;
    for (head = q; !head->hd(); head = head->back) ;
-   r = head->back;
+   expr *r = head->back;
 
-   new_head = new expr( "head");
+   expr *new_head = new expr( "head");
 
    if (q == head)
    {
@@ -864,14 +841,14 @@ split( expr *q)
 expr *
 split_at( expr *e)
 {
-   expr *p, *q;
+   expr *q;
 
    if (e->next->hd())
      q = nullptr;
    else
      q = split( e->next);
 
-   p = split( e);
+   expr *p = split( e);
    delete_exp( p);
    return q;
 }
@@ -880,9 +857,7 @@ split_at( expr *e)
 expr *
 split_down( expr *e)
 {
-   expr *f;
-
-   f = e->down;
+   expr *f = e->down;
    e->down = nullptr;
    return f;
 }
@@ -891,9 +866,7 @@ split_down( expr *e)
 void
 trim( char *s)
 {
-   char *t;
-
-   t = s + strlen( s) - 1;
+   char *t = s + strlen( s) - 1;
    do
    {
       if (*t == ' ' || *t == '\012' || *t == '\015') *t-- = '\0';
