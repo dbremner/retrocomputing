@@ -1,0 +1,1 @@
+Introduce the usual xmalloc wrapper function to reduce error checking elsewhere. The diag() function uses longjmp so my last checkin will leak memory if an allocation fails. 
