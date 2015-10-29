@@ -1,5 +1,4 @@
 #include "apl.h"
-#include <varargs.h>
 
 int chartab[];
 char *ecvt();
@@ -246,93 +245,6 @@ char *s;
 	mainloop();
 }
 
-printf(va_alist)
-va_dcl
-{
-	va_list pvar;
-	char *s, *cp;
-	int p;
-	data d;
-
-	va_start(pvar);
-	s = va_arg(pvar, char *);
-
-	while(*s) {
-		if(s[0] == '%') {
-			switch(s[1]){
-
-				case 'd':
-				p = va_arg(pvar, int);
-				putn(p);
-				s += 2;
-				continue;
-
-				case 'o':
-				p = va_arg(pvar, int);
-				puto(p);
-				s += 2;
-				continue;
-
-				case 's':
-				cp = va_arg(pvar, char *);
-				s += 2;
-				while(*cp) putchar(*cp++);
-				continue;
-
-				case 'f':
-				d = va_arg(pvar, double);
-				putf(&d);
-				s += 2;
-				continue;
-			}
-		}
-		putchar(*s);
-		s++;
-	}
-}
-
-putn(n)
-{
-	int a;
-
-	if (n < 0) {
-		n = -n;
-		if (n < 0) {
-			printf("32768");
-			return;
-		}
-		putchar('-');				/* apl minus sign, was '"' */
-	}
-	if (a = n / 10) putn(a);
-	putchar(n % 10 + '0');
-}
-
-putf(p)
-data *p;
-{
-	int i, param[4];
-
-	param[1] = param[2] = param[3] = param[0] = 0;
-	epr1(*p, param);
-	i = param[1] + param[2];		/* size if fp */
-	if(i > thread.digits) i += 100;
-	if(param[2]) i++;
-	if(i > param[0]+5) {
-		i = param[0] + 5;			/* size if ep */
-		param[1] = param[0];
-		param[2] = -1;
-	}
-	if(param[3]) i++;				/* sign */
-	i++;							/* leading space */
-	param[0] = i;
-	epr2(*p, param);
-}
-
-puto(n)
-{
-	if(n&0177770) puto( (n>>3) & 017777);
-	putchar( '0' + (n&07));
-}
 
 getchar()
 {
